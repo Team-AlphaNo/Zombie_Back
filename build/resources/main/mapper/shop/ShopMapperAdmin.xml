@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper">
+    <select id="getProductListAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopListDto" resultType="com.teamalphano.zombieboom.model.shop.Product">
+      SELECT
+            prod.prod_no,
+            lang.prod_name,
+            lang.prod_desc,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.prod_active,
+            prod.unity_prod_type
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_lang lang
+            on lang.prod_no = prod.prod_no
+        WHERE
+            1=1
+            <if test="type != null and type.size() > 0">
+                AND prod.prod_type IN
+                <foreach item="item" index="index" collection="type" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="priceType != null and priceType.size() > 0">
+                AND prod.prod_price_type IN
+                <foreach item="item" index="index" collection="priceType" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="activeType != null and activeType.size() > 0">
+                AND prod.prod_active IN
+                <foreach item="item" index="index" collection="activeType" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="searchType != null and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchType == 'name'">
+                        AND lang.prod_name LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchType == 'desc'">
+                        AND lang.prod_desc LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+            AND lang.lang_type = 'ko'
+        ORDER BY
+            CASE
+                WHEN prod.prod_limit = TRUE AND prod.prod_purchase_limit > 0 THEN 1
+                WHEN prod.prod_limit = FALSE THEN 2
+            ELSE 3
+        END,
+        prod.prod_ordr
+    </select>
+
+    <select id="getProductDetailAdmin" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.shop.ProductAdmin">
+         SELECT
+            prod.prod_no,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.unity_prod_type
+        FROM
+            tb_product prod
+        WHERE
+            1=1
+            AND prod.prod_no = #{prodNo}
+    </select>
+
+    <select id="getProductLangs" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.shop.ProductLang">
+        SELECT
+            lang.lang_type ,
+            lang.prod_name,
+            lang.prod_desc
+        FROM
+            tb_product_lang lang
+        WHERE
+            lang.prod_No = #{prodNo}
+    </select>
+
+    <insert id="createProductAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopCreateDto" useGeneratedKeys="true" keyProperty="prodNo">
+        INSERT INTO tb_product
+            (prod_price, prod_price_type, prod_type, prod_limit, prod_start_date, prod_end_date, prod_purchase_limit, prod_purchase_count, prod_ordr, prod_active, unity_prod_type)
+        VALUES
+            (#{prodPrice}, #{prodPriceType}, #{prodType}, #{prodLimit}, #{prodStartDatae}, #{prodEndDate}, #{prodPurchaseLimit}, #{prodPurchaseCount}, #{prodOrdr}, #{prodActive}, #{unityProdType})
+    </insert>
+
+    <update id="updateProductDetailAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopUpdateDto">
+        UPDATE
+            tb_product
+        SET
+            prod_price = #{prodPrice},
+            prod_price_type = #{prodPriceType},
+            prod_type = #{prodType},
+            prod_limit = #{prodLimit},
+            prod_start_date = #{prodStartDate},
+            prod_end_date = #{prodEndDate},
+            prod_purchase_limit = #{prodPurchaseLimit},
+            prod_purchase_count = #{prodPurchaseCount},
+            prod_ordr = #{prodOrdr},
+            prod_active = #{prodActive},
+            unity_prod_type = #{unityProdType}
+        WHERE
+            prod_no = #{prodNo}
+    </update>
+
+    <delete id="deleteProductAdmin" parameterType="Integer">
+        DELETE
+            FROM tb_product
+        WHERE
+            prod_no = #{prodNo}
+    </delete>
+
+    <update id="updateProductLang" parameterType="com.teamalphano.zombieboom.dto.shop.ShopLangDto">
+        UPDATE
+            tb_product_lang lang
+        SET
+            lang.prod_desc = #{prodDesc},
+            lang.prod_name = #{prodName}
+        WHERE
+            lang.prod_no = #{prodNo}
+            AND lang.lang_type = #{langType}
+    </update>
+</mapper>

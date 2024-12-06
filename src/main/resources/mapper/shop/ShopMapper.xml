@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamalphano.zombieboom.mapper.shop.ShopMapper">
+    <select id="getProducts" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
+        SELECT
+            prod.prod_no,
+            lang.prod_name,
+            lang.prod_desc,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.prod_active,
+            lang.lang_type,
+            prod.unity_prod_type
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_lang lang
+            on lang.prod_no = prod.prod_no
+        WHERE
+            1=1
+            AND (
+                (prod.prod_end_date IS NOT NULL
+                AND prod.prod_start_date &lt;= NOW()
+                AND NOW() &lt; prod.prod_end_date)
+            OR
+                (prod.prod_end_date IS NULL
+                AND prod.prod_start_date &lt;= NOW())
+            )
+            AND prod.prod_type = #{prodType}
+            AND prod.prod_active = true
+            AND lang.lang_type = #{langType}
+        ORDER BY
+            CASE
+                WHEN prod.prod_limit = TRUE AND prod.prod_purchase_limit > 0 THEN 1
+                WHEN prod.prod_limit = FALSE THEN 2
+            ELSE 3
+        END,
+        prod.prod_ordr
+    </select>
+
+    <select id="getProductItem" parameterType="int"  resultType="com.teamalphano.zombieboom.model.shop.ProductItem">
+        SELECT
+            pitem.prod_item_no,
+            pitem.item_no,
+            item.item_name,
+            item.item_img_key,
+            item.item_count,
+            item.item_type,
+            item.item_time
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_item pitem ON prod.prod_no = pitem.prod_no
+        INNER JOIN
+            tb_item item ON pitem.item_no = item.item_no
+        WHERE
+            prod.prod_no = #{prodNo}
+    </select>
+
+    <select id="getProductDetail" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
+        SELECT
+            prod.prod_no,
+            lang.prod_name,
+            lang.prod_desc,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.prod_active,
+            prod.unity_prod_type
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_lang lang
+            on lang.prod_no = prod.prod_no
+        WHERE
+            1=1
+            AND (
+                (prod.prod_end_date IS NOT NULL
+                AND prod.prod_start_date &lt;= NOW()
+                AND NOW() &lt; prod.prod_end_date)
+            OR
+                (prod.prod_end_date IS NULL
+                AND prod.prod_start_date &lt;= NOW())
+            )
+            AND prod.prod_active = true
+            AND prod.prod_no = #{prodNo}
+            AND lang.lang_type = #{langType}
+    </select>
+
+    <update id="updateProductAfterPurchase" parameterType="com.teamalphano.zombieboom.dto.user.UserBuyDto" >
+        UPDATE
+            tb_product product
+        <set>
+            <if test="prodPurchaseCount > 0">
+            product.prod_purchase_count = product.prod_purchase_count -1
+            </if>
+        </set>
+        WHERE
+            product.prod_no = #{prodNo}
+    </update>
+
+    <select id="getProductsAll" resultType="com.teamalphano.zombieboom.model.shop.Product">
+        SELECT
+            prod.prod_no,
+            lang.prod_name,
+            lang.prod_desc,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.prod_active,
+            prod.unity_prod_type
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_lang lang
+            on lang.prod_no = prod.prod_no
+        WHERE
+            1=1
+            AND (
+                (prod.prod_end_date IS NOT NULL
+                AND prod.prod_start_date &lt;= NOW()
+                AND NOW() &lt; prod.prod_end_date)
+            OR
+                (prod.prod_end_date IS NULL
+                AND prod.prod_start_date &lt;= NOW())
+            )
+            AND prod.prod_active = true
+        ORDER BY
+            CASE
+                WHEN prod.prod_limit = TRUE AND prod.prod_purchase_limit > 0 THEN 1
+                WHEN prod.prod_limit = FALSE THEN 2
+            ELSE 3
+        END,
+        prod.prod_ordr
+    </select>
+</mapper>

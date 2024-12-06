@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.teamalphano.zombieboom.mapper.user.UserInfoMapper">
+    <select id="getUserInfoByUUID" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            user.user_no,
+            user.user_id,
+            user.user_pwd,
+            user.user_name,
+            user.platform,
+            user.user_email,
+            user.create_date,
+            user.create_user,
+            user.update_user,
+            user.update_date,
+            user.del_yn,
+            user.user_uuid
+        FROM
+            tb_user_info user
+        WHERE
+            1=1
+            AND user.platform ='ANDROID'
+            AND user.user_uuid = #{uuid}
+            AND user.del_yn = false
+    </select>
+
+    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            user.user_no,
+            user.user_id,
+            user.user_pwd,
+            user.user_name,
+            user.platform,
+            user.user_email,
+            user.create_date,
+            user.create_user,
+            user.update_user,
+            user.update_date,
+            user.del_yn,
+            user.user_uuid
+        FROM
+            tb_user_info user
+        WHERE
+            1=1
+            AND user.platform ='ANDROID'
+            AND user.del_yn = false
+            AND user.user_no = #{userNo}
+    </select>
+
+    <select id="getUserInfoByUserId" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            user.user_no,
+            user.user_id,
+            user.user_pwd,
+            user.user_name,
+            user.platform,
+            user.user_email,
+            user.create_date,
+            user.create_user,
+            user.update_user,
+            user.update_date,
+            user.del_yn,
+            user.user_uuid
+        FROM
+            tb_user_info user
+        WHERE
+            1=1
+            AND user.platform ='ANDROID'
+            AND user.del_yn = false
+            AND user.user_id = #{userId}
+    </select>
+
+    <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
+        SELECT
+            user.user_no,
+            user.user_id,
+            user.user_pwd,
+            user.user_name,
+            user.platform,
+            user.user_email,
+            user.create_date,
+            user.create_user,
+            user.update_user,
+            user.update_date,
+            user.del_yn,
+            user.user_uuid
+        FROM
+            tb_user_info user
+            LEFT JOIN boom.tb_user_data data
+            on user.user_no = data.user_no
+        WHERE
+            1=1
+            AND user.platform ='ANDROID'
+            AND user.del_yn = false
+            AND data.user_no = #{userNo}
+    </select>
+
+    <insert id="insertGuestSignUp" parameterType="com.teamalphano.zombieboom.model.user.UserInfo" useGeneratedKeys="true" keyProperty="userNo">
+        INSERT INTO tb_user_info
+            (user_id, user_pwd, user_name, platform, user_email, create_user, create_date, del_yn, user_uuid)
+        VALUES
+            (null, null, 'guest', 'ANDROID', null, 'guest', now(), false, #{uuid})
+    </insert>
+
+    <insert id="insertDefaultUserData" parameterType="Int">
+        INSERT INTO tb_user_data
+            (user_no, user_char_list, user_ticket_timer)
+        VALUES
+            (#{userNo}, null, null)
+    </insert>
+
+    <update id="updateGuestSignIn" parameterType="String">
+        UPDATE
+            tb_user_info info
+        SET
+            info.last_lgin = now(),
+            info.update_date = now(),
+            info.update_user = 'LOGIN'
+        WHERE
+            info.user_uuid = #{uuid}
+    </update>
+
+    <insert id="insertGoogleSignUp" parameterType="com.teamalphano.zombieboom.model.user.UserInfo" useGeneratedKeys="true" keyProperty="userNo">
+        INSERT INTO tb_user_info
+            (user_id, user_pwd, user_name, platform, user_email, create_user, create_date, del_yn, user_uuid)
+        VALUES
+            ( #{userId}, null, #{userName}, 'ANDROID', #{userEmail}, #{userName}, NOW(), false, #{userUUID} )
+    </insert>
+
+    <update id="updateGoogleSignIn" parameterType="String">
+        UPDATE
+            tb_user_info info
+        SET
+            info.last_lgin = now(),
+            info.user_uuid = user_uuid,
+            info.update_date = now(),
+            info.update_user = 'LOGIN'
+        WHERE
+            info.user_id = #{userId}
+    </update>
+
+    <update id="updateUuidForGuestToGoogle" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+        UPDATE
+            tb_user_info info
+        SET
+            info.user_uuid = #{uuid},
+            info.update_date = now(),
+            info.update_user = 'LOGIN'
+        WHERE
+            info.user_id = #{userId}
+    </update>
+
+    <!-- 비활성화 -->
+    <update id="inactiveUserInfoByUserNo" parameterType="Integer">
+         UPDATE
+            tb_user_info info
+        SET
+            info.update_date = now(),
+            info.update_user = 'DELETE',
+            info.del_yn = true
+        WHERE
+            info.user_no = #{userNo}
+    </update>
+
+    <update id="inactiveUserInfoByUuid" parameterType="String">
+         UPDATE
+            tb_user_info info
+        SET
+            info.update_date = now(),
+            info.update_user = 'DELETE',
+            info.del_yn = true
+        WHERE
+            info.user_uuid = #{uuid}
+    </update>
+
+    <update id="updateUserInfoGoogleUUID" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+        UPDATE
+            tb_user_info info
+        SET
+            info.user_uuid = #{uuid},
+            info.update_date = now(),
+            info.update_user = 'LOGIN'
+        WHERE
+            info.user_id = #{userId}
+    </update>
+
+    <update id="updateGuestInfoToGPGS" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+        UPDATE
+            tb_user_info info
+        SET
+            info.user_id = #{userId},
+            info.user_email = #{userEmail},
+            info.user_name = #{userName},
+            info.update_date = now(),
+            info.update_user = 'LOGIN'
+        WHERE
+            info.user_no = #{userNo}
+    </update>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.teamalphano.zombieboom.mapper.user.UserAdminMapper">
+
+    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+        *
+        FROM
+        tb_user_info
+    </select>
+
+    <select id="getUserById" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+      SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            user.USER_ID = #{userId}
+        AND
+            user.del_yn = false
+    </select>
+
+</mapper>
