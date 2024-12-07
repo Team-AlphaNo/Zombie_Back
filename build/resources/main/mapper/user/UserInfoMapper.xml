@@ -101,7 +101,7 @@
         INSERT INTO tb_user_info
             (user_id, user_pwd, user_name, platform, user_email, create_user, create_date, del_yn, user_uuid)
         VALUES
-            (null, null, 'guest', 'ANDROID', null, 'guest', now(), false, #{uuid})
+            (null, null, 'guest', 'ANDROID', null, 'guest', now(), false, #{userUuid})
     </insert>
 
     <insert id="insertDefaultUserData" parameterType="Int">

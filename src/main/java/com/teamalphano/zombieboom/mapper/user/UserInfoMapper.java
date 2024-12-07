@@ -3,6 +3,7 @@ package com.teamalphano.zombieboom.mapper.user;
 import com.teamalphano.zombieboom.model.user.UserData;
 import com.teamalphano.zombieboom.model.user.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface UserInfoMapper {
@@ -43,4 +44,7 @@ public interface UserInfoMapper {
     int inactiveUserInfoByUserNo(Integer userNo);
     //uuid로 비활성화 처리
     int inactiveUserInfoByUuid(String uuid);
+
+    @Select("SELECT LAST_INSERT_ID()")
+    int getLastInsertedUserNo();
 }
