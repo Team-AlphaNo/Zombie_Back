@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.teamalphano.zombieboom.mapper.logs.PaymentLogsMapper">
+    <select id="getPaymentLogsList" resultType="com.teamalphano.zombieboom.model.logs.PaymentLog">
+        SELECT
+            pay.payment_logs_no,
+            pay.user_no,
+            pay.create_date,
+            pay.update_date,
+            pay.payment_status,
+            user.user_name,
+            user.user_uuid,
+            user.user_id,
+            user.user_email,
+            user.del_yn
+        FROM
+            tb_logs_payment pay
+        LEFT JOIN
+            tb_user_info user on user.user_no = pay.user_no
+    </select>
+</mapper>

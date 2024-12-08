@@ -106,9 +106,9 @@
 
     <insert id="insertDefaultUserData" parameterType="Int">
         INSERT INTO tb_user_data
-            (user_no, user_char_list, user_ticket_timer)
+            (user_no, user_ticket, user_char_list, user_ticket_timer)
         VALUES
-            (#{userNo}, null, null)
+            (#{userNo}, 5, null, null)
     </insert>
 
     <update id="updateGuestSignIn" parameterType="String">
@@ -145,7 +145,7 @@
         UPDATE
             tb_user_info info
         SET
-            info.user_uuid = #{uuid},
+            info.user_uuid = #{userUuid},
             info.update_date = now(),
             info.update_user = 'LOGIN'
         WHERE
@@ -179,7 +179,7 @@
         UPDATE
             tb_user_info info
         SET
-            info.user_uuid = #{uuid},
+            info.user_uuid = #{userUuid},
             info.update_date = now(),
             info.update_user = 'LOGIN'
         WHERE

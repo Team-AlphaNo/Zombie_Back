@@ -55,6 +55,10 @@ public class UserInfoService {
 
     @Transactional
     public UserFullData GoogleLogin(GoogleLoginDto googleLoginDto){
+        System.out.println("params getUserName : "+googleLoginDto.getUserName());
+        System.out.println("params userId : "+googleLoginDto.getUserId());
+        System.out.println("params userEmail : "+googleLoginDto.getUserEmail());
+        System.out.println("params getUserUUID : "+googleLoginDto.getUserUuid());
         UserInfo userInfo = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
         if(userInfo.getUserUuid() == null) {
             UserInfo _userInfo = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
@@ -72,7 +76,7 @@ public class UserInfoService {
 
                 UserInfo newUserInfo = new UserInfo();
                 newUserInfo.setUserUuid(googleLoginDto.getUserUuid());
-                newUserInfo.setUserID(googleLoginDto.getUserId());
+                newUserInfo.setUserId(googleLoginDto.getUserId());
                 newUserInfo.setUserName(googleLoginDto.getUserName());
                 newUserInfo.setUserEmail(googleLoginDto.getUserEmail());
                 int insert = userInfoMapper.insertGoogleSignUp(newUserInfo);
@@ -86,7 +90,7 @@ public class UserInfoService {
             }
         }else{
             //게스트 id 있음
-            if(userInfo.getUserID() != null){
+            if(userInfo.getUserId() != null){
                 //구글 로그인
                 System.out.println("#########게스트 아이디에 구글 로그인");
                 int updateLogin = userInfoMapper.updateGoogleSignIn(googleLoginDto.getUserId());
@@ -99,7 +103,7 @@ public class UserInfoService {
                     //아이디는 delete처리, 구글아이디에 uuid 업데이트
                     System.out.println("#########구글 아이디가 있고, 게스트 아이디도 있음");
                     System.out.println("#########아이디는 delete처리, 구글아이디에 uuid 업데이트");
-                    userInfoMapper.inactiveUserInfoByUserNo(userInfo.getUserNo());
+                    userInfoMapper.inactiveUserInfoByUserNo(_userInfo.getUserNo());
                     _userInfo.setUserUuid(googleLoginDto.getUserId());
                     userInfoMapper.updateUuidForGuestToGoogle(_userInfo);
                     return getUserFullData(_userInfo.getUserNo());
@@ -108,11 +112,23 @@ public class UserInfoService {
                     //게스트 아이디에 구글아이디 업데이트
                     System.out.println("#########게스트 아이디는 있으나 구글 아이디는 없음");
                     System.out.println("#########게스트 아이디에 구글아이디 업데이트");
-                    userInfo.setUserID(googleLoginDto.getUserId());
+                    System.out.println("params getUserName : "+googleLoginDto.getUserName());
+                    System.out.println("params userId : "+googleLoginDto.getUserId());
+                    System.out.println("params userEmail : "+googleLoginDto.getUserEmail());
+                    System.out.println("params getUserUUID : "+googleLoginDto.getUserUuid());
+                    System.out.println("params userNo : "+ userInfo.getUserNo());
+                    userInfo.setUserId(googleLoginDto.getUserId());
                     userInfo.setUserEmail(googleLoginDto.getUserEmail());
                     userInfo.setUserName(googleLoginDto.getUserName());
-                    userInfoMapper.updateGuestInfoToGPGS(userInfo);
-                    return getUserFullData(userInfo.getUserNo());
+                    int update = userInfoMapper.updateGuestInfoToGPGS(userInfo);
+                    System.out.println("userInfo userNo : "+ userInfo.getUserNo());
+                    System.out.println("userInfo setUserEmail : "+ userInfo.getUserEmail());
+                    System.out.println("userInfo setUserID : "+ userInfo.getUserId());
+                    if(update > 0) {
+                        return getUserFullData(userInfo.getUserNo());
+                    }else{
+                        System.out.println("no update");
+                    }
                 }
             }
         }

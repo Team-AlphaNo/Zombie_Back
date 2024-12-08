@@ -3,7 +3,7 @@ package com.teamalphano.zombieboom.model.user;
 public class UserInfo {
 
     private Integer userNo;
-    private String userID;
+    private String userId;
     private String userPwd;
     private String userName;
     private String platform;
@@ -23,12 +23,12 @@ public class UserInfo {
         this.userNo = userNo;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getUserPwd() {

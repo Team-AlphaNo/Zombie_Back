@@ -35,7 +35,7 @@ public interface UserInfoMapper {
     //구글 아이디 UUID 업데이트
     void updateUserInfoGoogleUUID(UserInfo userInfo);
     //게스트 아이디 - GPGS 데이터 업데이트
-    void updateGuestInfoToGPGS(UserInfo userInfo);
+    int updateGuestInfoToGPGS(UserInfo userInfo);
 
     //유저 정보 업데이트
     void updateUserInfo(UserInfo userInfo);
