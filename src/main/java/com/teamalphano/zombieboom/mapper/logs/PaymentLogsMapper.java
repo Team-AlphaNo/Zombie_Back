@@ -9,4 +9,8 @@ import java.util.List;
 public interface PaymentLogsMapper {
     //전체 구입 로그
     List<PaymentLog> getPaymentLogsList();
+
+    int insertPaymentLog(PaymentLog paymentLog);
+
+    int updatePaymentLog(PaymentLog paymentLog);
 }

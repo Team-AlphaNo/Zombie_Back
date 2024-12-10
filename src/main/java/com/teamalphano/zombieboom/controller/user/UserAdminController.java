@@ -1,6 +1,7 @@
 package com.teamalphano.zombieboom.controller.user;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
+import com.teamalphano.zombieboom.dto.user.AdminUserListDto;
 import com.teamalphano.zombieboom.dto.user.UserLoginDto;
 import com.teamalphano.zombieboom.model.user.UserInfo;
 import com.teamalphano.zombieboom.service.user.UserAdminService;
@@ -19,10 +20,12 @@ public class UserAdminController {
     }
 
     //유저 목록
-    @GetMapping("/list")
-    public ResponseEntity<ApiResponse<List<UserInfo>>> getAllUsers() {
+    @PostMapping("/list")
+    public ResponseEntity<ApiResponse<List<UserInfo>>> getAllUsers(
+            @RequestBody AdminUserListDto adminUserListDto
+    ) {
         try {
-            List<UserInfo> userList = userAdminService.getUserListAll();
+            List<UserInfo> userList = userAdminService.getUserListAll(adminUserListDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success",userList));
         }catch (Exception e) {
             return ResponseEntity.status(500).body( null);
@@ -31,7 +34,8 @@ public class UserAdminController {
 
     //관리자 - 로그인 처리
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserInfo>> AdminLogin(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<ApiResponse<UserInfo>> AdminLogin(
+            @RequestBody UserLoginDto userLoginDto) {
         try {
             UserInfo user = userAdminService.AdminLogin(userLoginDto);
             if (user != null) {

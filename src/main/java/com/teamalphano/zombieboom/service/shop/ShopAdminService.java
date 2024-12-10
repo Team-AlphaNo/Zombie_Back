@@ -9,7 +9,9 @@ import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,8 +24,9 @@ public class ShopAdminService {
         this.itemRelationMapper = itemRelationMapper;
     }
 
+    @Transactional
     public List<Product> getProductListAdmin(ShopListDto shopListDto){
-
+        //TODO: 검색조건 수정하기
         return shopAdminMapper.getProductListAdmin(shopListDto);
     }
 

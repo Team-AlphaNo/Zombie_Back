@@ -25,31 +25,29 @@
             on lang.prod_no = prod.prod_no
         WHERE
             1=1
-            <if test="type != null and type.size() > 0">
-                AND prod.prod_type IN
-                <foreach item="item" index="index" collection="type" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="priceType != null and priceType.size() > 0">
-                AND prod.prod_price_type IN
-                <foreach item="item" index="index" collection="priceType" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="activeType != null and activeType.size() > 0">
-                AND prod.prod_active IN
-                <foreach item="item" index="index" collection="activeType" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="searchType != null and searchValue != null and searchValue != ''">
+        <!--
+        <if test="type != null and type.size() > 0">
+            AND prod.prod_type IN
+            <foreach item="item" collection="type" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="priceType != null and priceType.size() > 0">
+            AND prod.prod_price_type IN
+            <foreach item="item" collection="priceType" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="activeType != null and activeType.size() > 0">
+            AND prod.prod_active IN
+            <foreach item="item" collection="activeType" open="(" separator="," close=")">
+                #{item, jdbcType=TINYINT}
+            </foreach>
+        </if> -->
+            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
                 <choose>
-                    <when test="searchType == 'name'">
+                    <when test="searchType == 'prodName'">
                         AND lang.prod_name LIKE CONCAT('%', #{searchValue}, '%')
-                    </when>
-                    <when test="searchType == 'desc'">
-                        AND lang.prod_desc LIKE CONCAT('%', #{searchValue}, '%')
                     </when>
                 </choose>
             </if>

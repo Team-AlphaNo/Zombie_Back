@@ -4,9 +4,7 @@ import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.model.logs.PaymentLog;
 import com.teamalphano.zombieboom.service.logs.PaymentLogsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +17,7 @@ public class PaymentLogsController {
         this.paymentLogsService = paymentLogsService;
     }
 
+    //로그 목록
     @GetMapping("/payments")
     public ResponseEntity<ApiResponse<List<PaymentLog>>> getPaymentLogsList() {
         try {

@@ -6,13 +6,21 @@ public class PaymentLog {
     private String paymentStatus;
     private String createDate;
     private String updateDate;
-
-    //유저 정보
-    private String userId;
-    private String userUuid;
     private String userName;
+    private String userUuid;
+    private String userId;
     private String userEmail;
     private boolean delYn;
+    private Integer prodNo;
+
+
+    public Integer getProdNo() {
+        return prodNo;
+    }
+
+    public void setProdNo(Integer prodNo) {
+        this.prodNo = prodNo;
+    }
 
     public String getUserEmail() {
         return userEmail;

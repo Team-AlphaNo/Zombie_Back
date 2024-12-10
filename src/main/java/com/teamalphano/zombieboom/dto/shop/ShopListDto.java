@@ -48,4 +48,15 @@ public class ShopListDto {
     public void setSearchValue(String searchValue) {
         this.searchValue = searchValue;
     }
+
+    @Override
+    public String toString() {
+        return "ShopListDto{" +
+                "type=" + type +
+                ", priceType=" + priceType +
+                ", activeType=" + activeType +
+                ", searchType='" + searchType + '\'' +
+                ", searchValue='" + searchValue + '\'' +
+                '}';
+    }
 }

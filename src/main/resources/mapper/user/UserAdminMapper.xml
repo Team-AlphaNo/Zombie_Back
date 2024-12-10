@@ -4,22 +4,32 @@
 
 <mapper namespace="com.teamalphano.zombieboom.mapper.user.UserAdminMapper">
 
-    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.model.user.UserInfo"
+            parameterType="com.teamalphano.zombieboom.dto.user.AdminUserListDto">
         SELECT
-        *
-        FROM
-        tb_user_info
-    </select>
-
-    <select id="getUserById" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
-      SELECT
             *
         FROM
             tb_user_info user
         WHERE
-            user.USER_ID = #{userId}
-        AND
-            user.del_yn = false
+            1=1
+            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchType == 'userName'">
+                        AND user.user_name LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+    </select>
+
+    <select id="getUserById" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            user.USER_ID = #{id}
+        AND user.del_yn = false
+        AND user.platform = 'ADMIN'
     </select>
 
 </mapper>

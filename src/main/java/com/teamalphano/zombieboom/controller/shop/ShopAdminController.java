@@ -26,6 +26,7 @@ public class ShopAdminController {
     public ResponseEntity<ApiResponse<List<Product>>> getProductListAdmin(
             @RequestBody ShopListDto shopListDto) {
         try {
+            System.out.println("ShopListDto: " + shopListDto.toString());
             List<Product> prod = shopAdminService.getProductListAdmin(shopListDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", prod));
         } catch (Exception e) {
