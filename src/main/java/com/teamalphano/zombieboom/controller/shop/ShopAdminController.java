@@ -4,6 +4,7 @@ import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
 import com.teamalphano.zombieboom.dto.shop.ShopListDto;
 import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
+import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.service.shop.ShopAdminService;
@@ -79,6 +80,18 @@ public class ShopAdminController {
         try {
             String response = shopAdminService.deleteProductAdmin(prodNo);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+        }
+    }
+
+    //상품 상세 아이템 목록 조회 - admin
+    @GetMapping("/product/detail/item")
+    public ResponseEntity<ApiResponse<List<ItemData>>> getProductDetailItemListAdmin(
+            @RequestParam(value = "prodNo", required = true) Integer prodNo) {
+        try {
+            List<ItemData> data = shopAdminService.getProductDetailItemListAdmin(prodNo);
+            return ResponseEntity.ok(new ApiResponse<>(200, "Success", data));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }

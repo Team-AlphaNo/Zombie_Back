@@ -1,26 +1,17 @@
-package com.teamalphano.zombieboom.model.shop;
+package com.teamalphano.zombieboom.model.item;
 
-public class ProductItem {
-    private int prodItemNo;
-    private int itemNo;
+public class ItemData {
+    private Integer itemNo;
     private String itemName;
-    private int itemCount;
+    private Integer itemCount;
     private String itemTime;
-    private int itemType;
+    private Integer itemType;
 
-    public int getProdItemNo() {
-        return prodItemNo;
-    }
-
-    public void setProdItemNo(int prodItemNo) {
-        this.prodItemNo = prodItemNo;
-    }
-
-    public int getItemNo() {
+    public Integer getItemNo() {
         return itemNo;
     }
 
-    public void setItemNo(int itemNo) {
+    public void setItemNo(Integer itemNo) {
         this.itemNo = itemNo;
     }
 
@@ -32,11 +23,11 @@ public class ProductItem {
         this.itemName = itemName;
     }
 
-    public int getItemCount() {
+    public Integer getItemCount() {
         return itemCount;
     }
 
-    public void setItemCount(int itemCount) {
+    public void setItemCount(Integer itemCount) {
         this.itemCount = itemCount;
     }
 
@@ -48,11 +39,11 @@ public class ProductItem {
         this.itemTime = itemTime;
     }
 
-    public int getItemType() {
+    public Integer getItemType() {
         return itemType;
     }
 
-    public void setItemType(int itemType) {
+    public void setItemType(Integer itemType) {
         this.itemType = itemType;
     }
 }

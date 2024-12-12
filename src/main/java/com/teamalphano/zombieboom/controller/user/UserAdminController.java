@@ -3,6 +3,7 @@ package com.teamalphano.zombieboom.controller.user;
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.user.AdminUserListDto;
 import com.teamalphano.zombieboom.dto.user.UserLoginDto;
+import com.teamalphano.zombieboom.model.user.UserFullData;
 import com.teamalphano.zombieboom.model.user.UserInfo;
 import com.teamalphano.zombieboom.service.user.UserAdminService;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,19 @@ public class UserAdminController {
             }
         }catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+        }
+    }
+
+    //상세정보
+    @GetMapping("/detail")
+    public ResponseEntity<ApiResponse<UserFullData>> getUserDataDetail(
+            @RequestParam(value = "userNo", required = true) int userNo
+    ) {
+        try {
+            UserFullData data = userAdminService.getUserDataDetail(userNo);
+            return ResponseEntity.ok(new ApiResponse<>(200, "Success",data));
+        }catch (Exception e) {
+            return ResponseEntity.status(500).body( null);
         }
     }
 }

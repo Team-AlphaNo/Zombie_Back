@@ -3,6 +3,7 @@ package com.teamalphano.zombieboom.mapper.shop;
 import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
 import com.teamalphano.zombieboom.dto.shop.ShopListDto;
 import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
+import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
@@ -35,4 +36,7 @@ public interface ShopAdminMapper {
 
     //상품 언어 수정
     void updateProductLang(ProductLang productLang);
+
+    //상품 상세 - 아이템 목록
+    List<ItemData> getProductDetailItemListAdmin(Integer prodNo);
 }

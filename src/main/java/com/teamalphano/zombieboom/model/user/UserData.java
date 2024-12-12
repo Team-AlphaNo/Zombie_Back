@@ -1,6 +1,6 @@
 package com.teamalphano.zombieboom.model.user;
 
-import com.teamalphano.zombieboom.model.character.CharacterData;
+import com.teamalphano.zombieboom.model.item.ItemData;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class UserData {
     private Integer userMoney;
     private String userCharList;
     private String userTicketTimer;
-    private List<CharacterData> userCharDataList;
+    private List<ItemData> userCharDataList;
     private Integer userSelectChar;
 
     public Integer getUserTicket() {
@@ -44,11 +44,11 @@ public class UserData {
         this.userTicketTimer = userTicketTimer;
     }
 
-    public List<CharacterData> getUserCharDataList() {
+    public List<ItemData> getUserCharDataList() {
         return userCharDataList;
     }
 
-    public void setUserCharDataList(List<CharacterData> userCharDataList) {
+    public void setUserCharDataList(List<ItemData> userCharDataList) {
         this.userCharDataList = userCharDataList;
     }
 

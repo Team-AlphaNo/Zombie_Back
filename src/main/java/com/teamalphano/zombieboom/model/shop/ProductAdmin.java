@@ -15,18 +15,11 @@ public class ProductAdmin {
     private int prodOrdr;
     private boolean prodActive;
     private Integer unityProdType;
+    private String itemImgKey;
 
     private List<ProductItem> items;    //상세 아이템 list
 
     private List<ProductLang> productLangData;
-
-    public Integer getUnityProdType() {
-        return unityProdType;
-    }
-
-    public void setUnityProdType(Integer unityProdType) {
-        this.unityProdType = unityProdType;
-    }
 
     public int getProdNo() {
         return prodNo;
@@ -114,6 +107,22 @@ public class ProductAdmin {
 
     public void setProdActive(boolean prodActive) {
         this.prodActive = prodActive;
+    }
+
+    public Integer getUnityProdType() {
+        return unityProdType;
+    }
+
+    public void setUnityProdType(Integer unityProdType) {
+        this.unityProdType = unityProdType;
+    }
+
+    public String getItemImgKey() {
+        return itemImgKey;
+    }
+
+    public void setItemImgKey(String itemImgKey) {
+        this.itemImgKey = itemImgKey;
     }
 
     public List<ProductItem> getItems() {

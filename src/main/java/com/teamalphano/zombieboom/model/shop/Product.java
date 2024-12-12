@@ -14,6 +14,7 @@ public class Product {
     private int prodPurchaseCount;
     private int prodOrdr;
     private boolean prodActive;
+    private String itemImgKey;
 
     private List<ProductItem> items;    //상세 아이템 list
 
@@ -24,48 +25,12 @@ public class Product {
 
     private Integer unityProdType;
 
-    public Integer getUnityProdType() {
-        return unityProdType;
-    }
-
-    public void setUnityProdType(Integer unityProdType) {
-        this.unityProdType = unityProdType;
-    }
-
-    public String getLangType() {
-        return langType;
-    }
-
-    public void setLangType(String langType) {
-        this.langType = langType;
-    }
-
-    public boolean isProdLimit() {
-        return prodLimit;
-    }
-
     public int getProdNo() {
         return prodNo;
     }
 
     public void setProdNo(int prodNo) {
         this.prodNo = prodNo;
-    }
-
-    public String getProdName() {
-        return prodName;
-    }
-
-    public void setProdName(String prodName) {
-        this.prodName = prodName;
-    }
-
-    public String getProdDesc() {
-        return prodDesc;
-    }
-
-    public void setProdDesc(String prodDesc) {
-        this.prodDesc = prodDesc;
     }
 
     public int getProdPrice() {
@@ -92,7 +57,7 @@ public class Product {
         this.prodType = prodType;
     }
 
-    public boolean getProdLimit() {
+    public boolean isProdLimit() {
         return prodLimit;
     }
 
@@ -148,11 +113,51 @@ public class Product {
         this.prodActive = prodActive;
     }
 
+    public String getItemImgKey() {
+        return itemImgKey;
+    }
+
+    public void setItemImgKey(String itemImgKey) {
+        this.itemImgKey = itemImgKey;
+    }
+
     public List<ProductItem> getItems() {
         return items;
     }
 
     public void setItems(List<ProductItem> items) {
         this.items = items;
+    }
+
+    public String getLangType() {
+        return langType;
+    }
+
+    public void setLangType(String langType) {
+        this.langType = langType;
+    }
+
+    public String getProdName() {
+        return prodName;
+    }
+
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
+    }
+
+    public String getProdDesc() {
+        return prodDesc;
+    }
+
+    public void setProdDesc(String prodDesc) {
+        this.prodDesc = prodDesc;
+    }
+
+    public Integer getUnityProdType() {
+        return unityProdType;
+    }
+
+    public void setUnityProdType(Integer unityProdType) {
+        this.unityProdType = unityProdType;
     }
 }

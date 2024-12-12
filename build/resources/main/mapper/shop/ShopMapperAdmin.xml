@@ -135,4 +135,16 @@
             lang.prod_no = #{prodNo}
             AND lang.lang_type = #{langType}
     </update>
+
+    <select id="getProductDetailItemListAdmin" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.item.ItemData">
+        SELECT
+            *
+        FROM
+            tb_item item
+        INNER JOIN
+            tb_product_item rel
+            on rel.item_no = item.item_no
+        WHERE
+            rel.prod_no = #{prodNo}
+    </select>
 </mapper>

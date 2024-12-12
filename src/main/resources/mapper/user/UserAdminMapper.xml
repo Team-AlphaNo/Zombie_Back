@@ -32,4 +32,21 @@
         AND user.platform = 'ADMIN'
     </select>
 
+    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            user.user_no = #{userNo}
+    </select>
+
+    <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
+        SELECT
+            *
+        FROM
+            tb_user_data data
+        WHERE
+            data.user_no = #{userNo}
+    </select>
 </mapper>

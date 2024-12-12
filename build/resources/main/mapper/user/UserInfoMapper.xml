@@ -74,18 +74,11 @@
 
     <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
         SELECT
-            user.user_no,
-            user.user_id,
-            user.user_pwd,
-            user.user_name,
-            user.platform,
-            user.user_email,
-            user.create_date,
-            user.create_user,
-            user.update_user,
-            user.update_date,
-            user.del_yn,
-            user.user_uuid
+            data.user_ticket,
+            data.user_money,
+            data.user_char_list,
+            data.user_select_char,
+            data.user_ticket_timer
         FROM
             tb_user_info user
             LEFT JOIN boom.tb_user_data data

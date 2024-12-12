@@ -18,7 +18,8 @@
             prod.prod_ordr,
             prod.prod_active,
             lang.lang_type,
-            prod.unity_prod_type
+            prod.unity_prod_type,
+            prod.item_img_key
         FROM
             tb_product prod
         INNER JOIN
@@ -51,7 +52,6 @@
             pitem.prod_item_no,
             pitem.item_no,
             item.item_name,
-            item.item_img_key,
             item.item_count,
             item.item_type,
             item.item_time
@@ -80,7 +80,8 @@
             prod.prod_purchase_count,
             prod.prod_ordr,
             prod.prod_active,
-            prod.unity_prod_type
+            prod.unity_prod_type,
+            prod.item_img_key
         FROM
             tb_product prod
         INNER JOIN
@@ -128,7 +129,8 @@
             prod.prod_purchase_count,
             prod.prod_ordr,
             prod.prod_active,
-            prod.unity_prod_type
+            prod.unity_prod_type,
+            prod.item_img_key
         FROM
             tb_product prod
         INNER JOIN

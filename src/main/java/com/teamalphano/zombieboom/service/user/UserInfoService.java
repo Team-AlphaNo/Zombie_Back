@@ -1,19 +1,27 @@
 package com.teamalphano.zombieboom.service.user;
 
 import com.teamalphano.zombieboom.dto.user.GoogleLoginDto;
+import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.user.UserInfoMapper;
+import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.user.UserData;
 import com.teamalphano.zombieboom.model.user.UserFullData;
 import com.teamalphano.zombieboom.model.user.UserInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class UserInfoService {
     private final UserInfoMapper userInfoMapper;
+    private final ItemMapper itemMapper;
 
-    public UserInfoService(UserInfoMapper userInfoMapper) {
+    public UserInfoService(UserInfoMapper userInfoMapper, ItemMapper itemMapper) {
         this.userInfoMapper = userInfoMapper;
+        this.itemMapper = itemMapper;
     }
 
     //게스트 회원가입
@@ -55,10 +63,6 @@ public class UserInfoService {
 
     @Transactional
     public UserFullData GoogleLogin(GoogleLoginDto googleLoginDto){
-        System.out.println("params getUserName : "+googleLoginDto.getUserName());
-        System.out.println("params userId : "+googleLoginDto.getUserId());
-        System.out.println("params userEmail : "+googleLoginDto.getUserEmail());
-        System.out.println("params getUserUUID : "+googleLoginDto.getUserUuid());
         UserInfo userInfo = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
         if(userInfo.getUserUuid() == null) {
             UserInfo _userInfo = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
@@ -112,18 +116,10 @@ public class UserInfoService {
                     //게스트 아이디에 구글아이디 업데이트
                     System.out.println("#########게스트 아이디는 있으나 구글 아이디는 없음");
                     System.out.println("#########게스트 아이디에 구글아이디 업데이트");
-                    System.out.println("params getUserName : "+googleLoginDto.getUserName());
-                    System.out.println("params userId : "+googleLoginDto.getUserId());
-                    System.out.println("params userEmail : "+googleLoginDto.getUserEmail());
-                    System.out.println("params getUserUUID : "+googleLoginDto.getUserUuid());
-                    System.out.println("params userNo : "+ userInfo.getUserNo());
                     userInfo.setUserId(googleLoginDto.getUserId());
                     userInfo.setUserEmail(googleLoginDto.getUserEmail());
                     userInfo.setUserName(googleLoginDto.getUserName());
                     int update = userInfoMapper.updateGuestInfoToGPGS(userInfo);
-                    System.out.println("userInfo userNo : "+ userInfo.getUserNo());
-                    System.out.println("userInfo setUserEmail : "+ userInfo.getUserEmail());
-                    System.out.println("userInfo setUserID : "+ userInfo.getUserId());
                     if(update > 0) {
                         return getUserFullData(userInfo.getUserNo());
                     }else{
@@ -145,11 +141,49 @@ public class UserInfoService {
     }
 
     private UserFullData getUserFullData(Integer userNo) {
+        // UserFullData 초기화
         UserFullData userFullData = new UserFullData();
         UserInfo userInfo = userInfoMapper.getUserInfoByUserNo(userNo);
         UserData userData = userInfoMapper.getUserDataByUserNo(userNo);
+
         userFullData.setUserInfo(userInfo);
         userFullData.setUserData(userData);
+
+        // UserData에서 charList 가져오기
+        String charList = userData.getUserCharList();
+        if (charList == null || charList.isEmpty()) {
+            return userFullData;
+        }
+
+        try {
+            // 문자열에서 대괄호 제거 및 파싱
+            String cleanedInput = charList.replaceAll("\\[|\\]", "");
+            String[] stringArray = cleanedInput.split(",\\s*");
+            int[] charArray = Arrays.stream(stringArray)
+                    .mapToInt(Integer::parseInt)
+                    .toArray();
+
+            // CharacterData 리스트 생성
+            List<ItemData> charDataList = new ArrayList<>();
+            for (int charId : charArray) {
+                System.out.println("Processing charId: " + charId);
+                ItemData charData = itemMapper.getCharData(charId);
+                if (charData != null) {
+                    charDataList.add(charData);
+                } else {
+                    System.err.println("No CharacterData found for charId: " + charId);
+                }
+            }
+
+            userData.setUserCharDataList(charDataList);
+
+        } catch (NumberFormatException e) {
+            System.err.println("Failed to parse UserCharList: " + charList);
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Unexpected error occurred while processing UserCharList for userNo: " + userNo);
+            e.printStackTrace();
+        }
         return userFullData;
     }
 }

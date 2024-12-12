@@ -2,10 +2,9 @@ package com.teamalphano.zombieboom.service.user;
 
 import com.teamalphano.zombieboom.common.CharStringEdit;
 import com.teamalphano.zombieboom.dto.user.UserBuyDto;
-import com.teamalphano.zombieboom.mapper.character.CharacterMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
 import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
-import com.teamalphano.zombieboom.model.character.CharacterData;
+import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductItem;
 import com.teamalphano.zombieboom.model.user.UserData;
@@ -20,12 +19,10 @@ import java.util.List;
 public class UserDataService {
     private final UserDataMapper userDataMapper;
     private final ShopMapper shopMapper;
-    private final CharacterMapper characterMapper;
 
-    public UserDataService(UserDataMapper userDataMapper, ShopMapper shopMapper, CharacterMapper characterMapper) {
+    public UserDataService(UserDataMapper userDataMapper, ShopMapper shopMapper) {
         this.userDataMapper = userDataMapper;
         this.shopMapper = shopMapper;
-        this.characterMapper = characterMapper;
     }
 
     //상품 구입
@@ -103,7 +100,8 @@ public class UserDataService {
             if(updateProdData > 0){
                 //갱신한 유저 데이터 조회
                 UserData userData = userDataMapper.getUserData(userBuyDto.getUserNo());
-                return addCharDataToUserData(userData);
+                return userData;
+                //return addCharDataToUserData(userData);
             }else{
                 return null;
             }
@@ -115,21 +113,22 @@ public class UserDataService {
     //유저 데이터 조회
     public UserData getUserData(Integer userNo) {
         UserData userData = userDataMapper.getUserData(userNo);
-        return addCharDataToUserData(userData);
+        return userData;
+        //return addCharDataToUserData(userData);
     }
 
     //공통 유저 캐릭터 데이터 list
-    private UserData addCharDataToUserData(UserData userData) {
-        if(!userData.getUserCharList().equals("[]")){
-            CharStringEdit charStringEdit = new CharStringEdit();
-            List<Integer> charNoList = charStringEdit.getIntList(userData.getUserCharList());
-            List<CharacterData> charDataList = new ArrayList<>();
-            for(Integer charNo : charNoList){
-                //유저 상세 캐릭터 데이터 조회
-                charDataList.add(characterMapper.getCharDataList(charNo));
-            }
-            userData.setUserCharDataList(charDataList);
-        }
-        return userData;
-    }
+//    private UserData addCharDataToUserData(UserData userData) {
+//        if(!userData.getUserCharList().equals("[]")){
+//            CharStringEdit charStringEdit = new CharStringEdit();
+//            List<Integer> charNoList = charStringEdit.getIntList(userData.getUserCharList());
+//            List<ItemData> charDataList = new ArrayList<>();
+//            for(Integer charNo : charNoList){
+//                //유저 상세 캐릭터 데이터 조회
+//                charDataList.add(characterMapper.getCharDataList(charNo));
+//            }
+//            userData.setUserCharDataList(charDataList);
+//        }
+//        return userData;
+//    }
 }
