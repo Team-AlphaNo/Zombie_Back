@@ -17,7 +17,7 @@ public class UserDataController {
     //아이템 구입
     @PostMapping("/buy")
     public ResponseEntity<ApiResponse<UserData>> buyProduct(@RequestBody UserBuyDto userBuyDto) {
-        if(userBuyDto.getUserNo() == 0 || userBuyDto.getProdNo() == 0){
+        if(userBuyDto.getUserNo() == 0 || userBuyDto.getProdId() == null){
             ResponseEntity.badRequest().body(new ApiResponse<>(400, "Bad Request 400", null));
         }
         try{

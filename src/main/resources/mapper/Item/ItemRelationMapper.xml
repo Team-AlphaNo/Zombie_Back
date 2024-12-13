@@ -9,4 +9,19 @@
         WHERE
             prod_no = #{prodNo}
     </delete>
+
+    <insert id="addItemRelationsToProd" parameterType="com.teamalphano.zombieboom.dto.item.ReqItemRelationDto">
+        INSERT INTO tb_product_item
+            (prod_no, item_no)
+        values
+            (#{prodNo} , #{itemNo})
+    </insert>
+
+    <delete id="removeItemRelationsToProd" parameterType="com.teamalphano.zombieboom.dto.item.ReqItemRelationDto">
+        DELETE
+            FROM tb_product_item
+        WHERE
+            prod_no = #{prod_no}
+            AND item_no = #{item_no}
+    </delete>
 </mapper>

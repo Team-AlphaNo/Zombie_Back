@@ -3,6 +3,7 @@ package com.teamalphano.zombieboom.dto.shop;
 public class ShopCreateDto {
 
     private int prodNo;
+    private String prodId;
     private int prodPrice;
     private int prodPriceType;
     private int prodType;
@@ -13,6 +14,7 @@ public class ShopCreateDto {
     private int prodPurchaseCount;
     private int prodOrdr;
     private boolean prodActive;
+    private String prodImgKey;
 
     private String prodName;
     private String prodDesc;
@@ -23,6 +25,14 @@ public class ShopCreateDto {
 
     public void setProdNo(int prodNo) {
         this.prodNo = prodNo;
+    }
+
+    public String getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
     public int getProdPrice() {
@@ -103,6 +113,14 @@ public class ShopCreateDto {
 
     public void setProdActive(boolean prodActive) {
         this.prodActive = prodActive;
+    }
+
+    public String getProdImgKey() {
+        return prodImgKey;
+    }
+
+    public void setProdImgKey(String prodImgKey) {
+        this.prodImgKey = prodImgKey;
     }
 
     public String getProdName() {

@@ -13,7 +13,8 @@ public interface ShopMapper {
     List<Product> getProducts(Product product);
 
     // 특정 상품의 아이템 리스트 조회
-    List<ProductItem> getProductItem(Integer prodNo);
+    List<ProductItem> getProductItemById(String prodId);
+    List<ProductItem> getProductItemByNo(Integer prodNo);
     
     //특정 상품 상세 조회
     Product getProductDetail(Product product);

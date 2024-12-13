@@ -5,6 +5,7 @@
     <select id="getProducts" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
         SELECT
             prod.prod_no,
+            prod.prod_id,
             lang.prod_name,
             lang.prod_desc,
             prod.prod_price,
@@ -19,7 +20,7 @@
             prod.prod_active,
             lang.lang_type,
             prod.unity_prod_type,
-            prod.item_img_key
+            prod.prod_img_key
         FROM
             tb_product prod
         INNER JOIN
@@ -62,12 +63,13 @@
         INNER JOIN
             tb_item item ON pitem.item_no = item.item_no
         WHERE
-            prod.prod_no = #{prodNo}
+            prod.prod_id = #{prodId}
     </select>
 
     <select id="getProductDetail" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
         SELECT
             prod.prod_no,
+            prod.prod_id,
             lang.prod_name,
             lang.prod_desc,
             prod.prod_price,
@@ -81,7 +83,7 @@
             prod.prod_ordr,
             prod.prod_active,
             prod.unity_prod_type,
-            prod.item_img_key
+            prod.prod_img_key
         FROM
             tb_product prod
         INNER JOIN
@@ -98,7 +100,7 @@
                 AND prod.prod_start_date &lt;= NOW())
             )
             AND prod.prod_active = true
-            AND prod.prod_no = #{prodNo}
+            AND prod.prod_id = #{prodId}
             AND lang.lang_type = #{langType}
     </select>
 
@@ -117,6 +119,7 @@
     <select id="getProductsAll" resultType="com.teamalphano.zombieboom.model.shop.Product">
         SELECT
             prod.prod_no,
+            prod.prod_id,
             lang.prod_name,
             lang.prod_desc,
             prod.prod_price,
@@ -130,7 +133,7 @@
             prod.prod_ordr,
             prod.prod_active,
             prod.unity_prod_type,
-            prod.item_img_key
+            prod.prod_img_key
         FROM
             tb_product prod
         INNER JOIN

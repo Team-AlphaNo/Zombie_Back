@@ -2,6 +2,7 @@ package com.teamalphano.zombieboom.service.user;
 
 import com.teamalphano.zombieboom.common.CharStringEdit;
 import com.teamalphano.zombieboom.dto.user.UserBuyDto;
+import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
 import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
 import com.teamalphano.zombieboom.model.item.ItemData;
@@ -19,31 +20,53 @@ import java.util.List;
 public class UserDataService {
     private final UserDataMapper userDataMapper;
     private final ShopMapper shopMapper;
+    private final ItemMapper itemMapper;
 
-    public UserDataService(UserDataMapper userDataMapper, ShopMapper shopMapper) {
+    public UserDataService(UserDataMapper userDataMapper, ShopMapper shopMapper, ItemMapper itemMapper) {
         this.userDataMapper = userDataMapper;
         this.shopMapper = shopMapper;
+        this.itemMapper = itemMapper;
     }
 
     //상품 구입
     public UserData buyProduct(UserBuyDto userBuyDto) {
         Product productParam = new Product();
-        productParam.setProdNo(userBuyDto.getProdNo());
+        productParam.setProdId(userBuyDto.getProdId());
 
         //상품 상세 데이터
         Product product = shopMapper.getProductDetail(productParam);
         if (product != null) {
-            if(product.getProdLimit() && product.getProdPurchaseCount()<=0){
+            if(product.isProdLimit() && product.getProdPurchaseCount()<=0){
                 System.out.println("상품 다 팔림");
                 return null;
             }
-            List<ProductItem> items = shopMapper.getProductItem(userBuyDto.getProdNo());
+            List<ProductItem> items = shopMapper.getProductItemById(userBuyDto.getProdId());
             product.setItems(items);
         }else{
             System.out.println("상품 없음");
             return null;
         }
 
+        buyProdCheck(productParam, userBuyDto);
+
+        //유저 데이터 갱신
+        int updateUserData = userDataMapper.updateUserDataAfterPurchase(userBuyDto);
+        if(updateUserData > 0){
+            //상점 데이터 갱신
+            int updateProdData = shopMapper.updateProductAfterPurchase(userBuyDto);
+            if(updateProdData > 0){
+                //갱신한 유저 데이터 조회
+                UserData userData = userDataMapper.getUserData(userBuyDto.getUserNo());
+                return addCharDataToUserData(userData);
+            }else{
+                return null;
+            }
+        }else {
+            return null;
+        }
+    }
+
+    private void buyProdCheck(Product product, UserBuyDto userBuyDto) {
         List<Integer> charList = new ArrayList<>();
         int coin = 0;
         int ticket = 0;
@@ -53,16 +76,14 @@ public class UserDataService {
         if(product.getItems() != null){
             for(ProductItem items : product.getItems()){
                 if(items.getItemType() ==1){
-                    //캐릭터
-                    //todo: test
-                    //charList.add(items.getCharNo());
-                }else if(items.getItemType() ==2){
-                    // 냥코인
-                    coin++;
+                    charList.add(items.getItemNo());
+                }else if(items.getItemType() == 2){
+                    // 코인
+                    coin += items.getItemCount();
                 }else{
                     //츄르
                     if(items.getItemTime().isEmpty()) {
-                        ticket++;
+                        ticket += items.getItemCount();
                     }else{
                         LocalTime t = LocalTime.parse(items.getItemTime(), formatter);
                         totalTime = totalTime.plusHours(t.getHour())
@@ -83,7 +104,7 @@ public class UserDataService {
             userBuyDto.setCharList(charStringEdit.getListToString(charList));
         }
 
-        if(userBuyDto.getIsCoin()){
+        if(userBuyDto.isCoin()){
             coin -= product.getProdPrice();
         }
 
@@ -91,44 +112,33 @@ public class UserDataService {
         userBuyDto.setCharList(jsonString);
         userBuyDto.setCoin(coin);
         userBuyDto.setTicket(ticket);
-
-        //유저 데이터 갱신
-        int updateUserData = userDataMapper.updateUserDataAfterPurchase(userBuyDto);
-        if(updateUserData > 0){
-            //상점 데이터 갱신
-            int updateProdData = shopMapper.updateProductAfterPurchase(userBuyDto);
-            if(updateProdData > 0){
-                //갱신한 유저 데이터 조회
-                UserData userData = userDataMapper.getUserData(userBuyDto.getUserNo());
-                return userData;
-                //return addCharDataToUserData(userData);
-            }else{
-                return null;
-            }
-        }else {
-            return null;
-        }
     }
 
     //유저 데이터 조회
     public UserData getUserData(Integer userNo) {
         UserData userData = userDataMapper.getUserData(userNo);
-        return userData;
-        //return addCharDataToUserData(userData);
+        return addCharDataToUserData(userData);
     }
 
     //공통 유저 캐릭터 데이터 list
-//    private UserData addCharDataToUserData(UserData userData) {
-//        if(!userData.getUserCharList().equals("[]")){
-//            CharStringEdit charStringEdit = new CharStringEdit();
-//            List<Integer> charNoList = charStringEdit.getIntList(userData.getUserCharList());
-//            List<ItemData> charDataList = new ArrayList<>();
-//            for(Integer charNo : charNoList){
-//                //유저 상세 캐릭터 데이터 조회
-//                charDataList.add(characterMapper.getCharDataList(charNo));
-//            }
-//            userData.setUserCharDataList(charDataList);
-//        }
-//        return userData;
-//    }
+    private UserData addCharDataToUserData(UserData userData) {
+        if(!userData.getUserCharList().equals("[]")){
+            CharStringEdit charStringEdit = new CharStringEdit();
+            List<Integer> charNoList = charStringEdit.getIntList(userData.getUserCharList());
+
+            // CharacterData 리스트 생성
+            List<ItemData> charDataList = new ArrayList<>();
+            for (int charId : charNoList) {
+                System.out.println("Processing charId: " + charId);
+                ItemData charData = itemMapper.getCharData(charId);
+                if (charData != null) {
+                    charDataList.add(charData);
+                } else {
+                    System.err.println("No CharacterData found for charId: " + charId);
+                }
+            }
+            userData.setUserCharDataList(charDataList);
+        }
+        return userData;
+    }
 }

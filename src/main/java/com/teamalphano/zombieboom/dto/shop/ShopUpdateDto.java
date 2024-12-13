@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ShopUpdateDto {
     private int prodNo;
+    private String prodId;
     private int prodPrice;
     private int prodPriceType;
     private int prodType;
@@ -16,6 +17,7 @@ public class ShopUpdateDto {
     private int prodPurchaseCount;
     private int prodOrdr;
     private boolean prodActive;
+    private String prodImgKey;
 
     private List<ProductLang> langData;
 
@@ -25,6 +27,14 @@ public class ShopUpdateDto {
 
     public void setProdNo(int prodNo) {
         this.prodNo = prodNo;
+    }
+
+    public String getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
     }
 
     public int getProdPrice() {
@@ -105,6 +115,14 @@ public class ShopUpdateDto {
 
     public void setProdActive(boolean prodActive) {
         this.prodActive = prodActive;
+    }
+
+    public String getProdImgKey() {
+        return prodImgKey;
+    }
+
+    public void setProdImgKey(String prodImgKey) {
+        this.prodImgKey = prodImgKey;
     }
 
     public List<ProductLang> getLangData() {

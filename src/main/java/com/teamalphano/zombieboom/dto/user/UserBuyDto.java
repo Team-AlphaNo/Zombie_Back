@@ -2,7 +2,7 @@ package com.teamalphano.zombieboom.dto.user;
 
 public class UserBuyDto {
     private int userNo;
-    private int prodNo;
+    private String prodId;
     private boolean isCoin;
 
     private int coin;
@@ -10,16 +10,28 @@ public class UserBuyDto {
     private String charList;
     private String userTicketTimer;
 
-    public String getUserTicketTimer() {
-        return userTicketTimer;
-    }
-
-    public void setUserTicketTimer(String userTicketTimer) {
-        this.userTicketTimer = userTicketTimer;
-    }
-
     public int getUserNo() {
         return userNo;
+    }
+
+    public void setUserNo(int userNo) {
+        this.userNo = userNo;
+    }
+
+    public String getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(String prodId) {
+        this.prodId = prodId;
+    }
+
+    public boolean isCoin() {
+        return isCoin;
+    }
+
+    public void setCoin(boolean coin) {
+        isCoin = coin;
     }
 
     public int getCoin() {
@@ -46,23 +58,11 @@ public class UserBuyDto {
         this.charList = charList;
     }
 
-    public void setUserNo(int userNo) {
-        this.userNo = userNo;
+    public String getUserTicketTimer() {
+        return userTicketTimer;
     }
 
-    public int getProdNo() {
-        return prodNo;
-    }
-
-    public void setProdNo(int prodNo) {
-        this.prodNo = prodNo;
-    }
-
-    public boolean getIsCoin() {
-        return isCoin;
-    }
-
-    public void setCoin(boolean coin) {
-        isCoin = coin;
+    public void setUserTicketTimer(String userTicketTimer) {
+        this.userTicketTimer = userTicketTimer;
     }
 }

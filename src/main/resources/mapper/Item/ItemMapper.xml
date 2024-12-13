@@ -10,4 +10,23 @@
         WHERE
             item.item_no = #{itemNo}
     </select>
+
+    <select id="getItemListAdmin" parameterType="com.teamalphano.zombieboom.dto.item.ItemListDto" resultType="com.teamalphano.zombieboom.model.item.ItemData">
+         SELECT
+            *
+        FROM
+            tb_item item
+    </select>
+
+    <select id="getProductItemListAdmin" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.item.ItemData">
+        SELECT
+            *
+        FROM
+            tb_item item
+        INNER JOIN
+            tb_product_item rel
+            on rel.item_no = item.item_no
+        WHERE
+            rel.prod_no = #{prodNo}
+    </select>
 </mapper>

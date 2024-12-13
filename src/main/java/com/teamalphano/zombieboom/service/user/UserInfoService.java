@@ -1,5 +1,6 @@
 package com.teamalphano.zombieboom.service.user;
 
+import com.teamalphano.zombieboom.common.CharStringEdit;
 import com.teamalphano.zombieboom.dto.user.GoogleLoginDto;
 import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.user.UserInfoMapper;
@@ -157,15 +158,12 @@ public class UserInfoService {
 
         try {
             // 문자열에서 대괄호 제거 및 파싱
-            String cleanedInput = charList.replaceAll("\\[|\\]", "");
-            String[] stringArray = cleanedInput.split(",\\s*");
-            int[] charArray = Arrays.stream(stringArray)
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
+            CharStringEdit charStringEdit = new CharStringEdit();
+            List<Integer> charNoList = charStringEdit.getIntList(charList);
 
             // CharacterData 리스트 생성
             List<ItemData> charDataList = new ArrayList<>();
-            for (int charId : charArray) {
+            for (int charId : charNoList) {
                 System.out.println("Processing charId: " + charId);
                 ItemData charData = itemMapper.getCharData(charId);
                 if (charData != null) {

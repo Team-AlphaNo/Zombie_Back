@@ -5,7 +5,6 @@ import com.teamalphano.zombieboom.dto.shop.ShopListDto;
 import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
 import com.teamalphano.zombieboom.mapper.item.ItemRelationMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper;
-import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
@@ -84,8 +83,5 @@ public class ShopAdminService {
         }
     }
     
-    //상품 상세 아이템 목록
-    public List<ItemData> getProductDetailItemListAdmin(Integer prodNo){
-        return shopAdminMapper.getProductDetailItemListAdmin(prodNo);
-    }
+
 }

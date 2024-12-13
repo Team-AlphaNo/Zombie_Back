@@ -4,7 +4,8 @@
 <mapper namespace="com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper">
     <select id="getProductListAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopListDto" resultType="com.teamalphano.zombieboom.model.shop.Product">
       SELECT
-            prod.prod_no,
+            prod.prod_no
+            prod.prod_id,
             lang.prod_name,
             lang.prod_desc,
             prod.prod_price,
@@ -18,7 +19,7 @@
             prod.prod_ordr,
             prod.prod_active,
             prod.unity_prod_type,
-            prod.item_img_key
+            prod.prod_img_key
         FROM
             tb_product prod
         INNER JOIN
@@ -85,15 +86,16 @@
 
     <insert id="createProductAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopCreateDto" useGeneratedKeys="true" keyProperty="prodNo">
         INSERT INTO tb_product
-            (prod_price, prod_price_type, prod_type, prod_limit, prod_start_date, prod_end_date, prod_purchase_limit, prod_purchase_count, prod_ordr, prod_active, unity_prod_type)
+            (prod_id, prod_price, prod_price_type, prod_type, prod_limit, prod_start_date, prod_end_date, prod_purchase_limit, prod_purchase_count, prod_ordr, prod_active, unity_prod_type, prod_img_key)
         VALUES
-            (#{prodPrice}, #{prodPriceType}, #{prodType}, #{prodLimit}, #{prodStartDatae}, #{prodEndDate}, #{prodPurchaseLimit}, #{prodPurchaseCount}, #{prodOrdr}, #{prodActive}, #{unityProdType})
+            (#{prodId}, #{prodPrice}, #{prodPriceType}, #{prodType}, #{prodLimit}, #{prodStartDatae}, #{prodEndDate}, #{prodPurchaseLimit}, #{prodPurchaseCount}, #{prodOrdr}, #{prodActive}, #{unityProdType}, #{prodImgKey})
     </insert>
 
     <update id="updateProductDetailAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopUpdateDto">
         UPDATE
             tb_product
         SET
+            prod_id = #{prodId},
             prod_price = #{prodPrice},
             prod_price_type = #{prodPriceType},
             prod_type = #{prodType},
@@ -105,7 +107,7 @@
             prod_ordr = #{prodOrdr},
             prod_active = #{prodActive},
             unity_prod_type = #{unityProdType},
-            item_img_key = #{itemImgKey}
+            prod_img_key = #{prodImgKey}
         WHERE
             prod_no = #{prodNo}
     </update>
@@ -127,16 +129,4 @@
             lang.prod_no = #{prodNo}
             AND lang.lang_type = #{langType}
     </update>
-
-    <select id="getProductDetailItemListAdmin" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.item.ItemData">
-        SELECT
-            *
-        FROM
-            tb_item item
-        INNER JOIN
-            tb_product_item rel
-            on rel.item_no = item.item_no
-        WHERE
-            rel.prod_no = #{prodNo}
-    </select>
 </mapper>

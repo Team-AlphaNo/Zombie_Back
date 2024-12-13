@@ -32,7 +32,7 @@ public class ShopService {
         if (products != null) {
             for (Product product : products) {
                 // 상세 아이템 리스트 조회
-                List<ProductItem> items = shopMapper.getProductItem(product.getProdNo());
+                List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
                 product.setItems(items);}
         }else{
             System.out.println("products 리스트가 null입니다.");
@@ -49,7 +49,7 @@ public class ShopService {
 
         Product product = shopMapper.getProductDetail(productParam);
         if (product != null) {
-            List<ProductItem> items = shopMapper.getProductItem(prodNo);
+            List<ProductItem> items = shopMapper.getProductItemByNo(prodNo);
             product.setItems(items);
         }else{
             System.out.println("상품 없음");
@@ -64,7 +64,7 @@ public class ShopService {
         if (products != null) {
             for (Product product : products) {
                 // 상세 아이템 리스트 조회
-                List<ProductItem> items = shopMapper.getProductItem(product.getProdNo());
+                List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
                 product.setItems(items);}
         }else{
             System.out.println("products 리스트가 null입니다.");
