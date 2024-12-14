@@ -16,4 +16,8 @@ public interface ItemMapper {
 
     //상품 상세 - 아이템 목록
     List<ItemData> getProductItemListAdmin(Integer prodNo);
+
+    int insertItemAdmin(ItemData itemData);
+
+    int updateItemAdmin(ItemData itemData);
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamalphano.zombieboom.mapper.item.ItemRelationMapper">
+
+    <delete id="deleteItemRelationByProdNo" parameterType="Integer">
+        DELETE
+            FROM tb_product_item
+        WHERE
+            prod_no = #{prodNo}
+    </delete>
+
+    <insert id="addItemRelationsToProd" parameterType="com.teamalphano.zombieboom.dto.item.ReqItemRelationDto">
+        INSERT INTO tb_product_item
+            (prod_no, item_no)
+        values
+            (#{prodNo} , #{itemNo})
+    </insert>
+
+    <delete id="removeItemRelationsToProd" parameterType="com.teamalphano.zombieboom.dto.item.ReqItemRelationDto">
+        DELETE
+            FROM tb_product_item
+        WHERE
+            prod_no = #{prod_no}
+            AND item_no = #{item_no}
+    </delete>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.teamalphano.zombieboom.mapper.user.UserAdminMapper">
+
+    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.model.user.UserInfo"
+            parameterType="com.teamalphano.zombieboom.dto.user.AdminUserListDto">
+        SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            1=1
+            <if test="searchType != null and searchType != '' and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchType == 'userName'">
+                        AND user.user_name LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+    </select>
+
+    <select id="getUserById" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            user.USER_ID = #{id}
+        AND user.del_yn = false
+        AND user.platform = 'ADMIN'
+    </select>
+
+    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+        SELECT
+            *
+        FROM
+            tb_user_info user
+        WHERE
+            user.user_no = #{userNo}
+    </select>
+
+    <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
+        SELECT
+            *
+        FROM
+            tb_user_data data
+        WHERE
+            data.user_no = #{userNo}
+    </select>
+</mapper>

@@ -43,4 +43,20 @@ public class ItemController {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }
     }
+
+    //아이템 등록 - admin
+    @PostMapping("/insert")
+    public ResponseEntity<ApiResponse<String>> insertItemAdmin(
+            @RequestBody ItemData itemData) {
+        try {
+            String data = itemService.updateItemAdmin(itemData);
+            if(data.equals("Success")){
+                return ResponseEntity.ok(new ApiResponse<>(200, "Success", data));
+            }else{
+                return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+        }
+    }
 }

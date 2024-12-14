@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Zombie_Back.iml" filepath="$PROJECT_DIR$/.idea/Zombie_Back.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/zombieBoom.main.iml" filepath="$PROJECT_DIR$/.idea/modules/zombieBoom.main.iml" />
     </modules>
   </component>
 </project>
