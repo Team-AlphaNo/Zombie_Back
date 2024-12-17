@@ -29,4 +29,32 @@
         WHERE
             rel.prod_no = #{prodNo}
     </select>
+
+    <insert id="insertItemAdmin" parameterType="com.teamalphano.zombieboom.model.item.ItemData">
+        INSERT INTO tb_item
+            (item_name, item_count, item_time, item_type)
+        VALUES
+            (#{itemName}, #{itemCount}, #{itemTime}, #{itemType})
+    </insert>
+
+    <update id="updateItemAdmin" parameterType="com.teamalphano.zombieboom.model.item.ItemData">
+        UPDATE
+            tb_item item
+        <set>
+            <if test="itemName != null AND itemName !=''">
+                item.item_name = #{itemName}
+            </if>
+            <if test="itemCount != null">
+                item.item_count =#{itemCount}
+            </if>
+            <if test="itemTime != null AND itemTime != ''">
+                item.item_time =#{itemTime}
+            </if>
+            <if test="itemType != null AND itemType != ''">
+                item.item_type =#{itemType}
+            </if>
+        </set>
+        WHERE
+            item.itemNo = #{itemNo}
+    </update>
 </mapper>

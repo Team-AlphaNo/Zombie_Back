@@ -56,7 +56,7 @@ public class ShopController {
     public ResponseEntity<ApiResponse<List<Product>>> getProductsAll() {
         try {
             List<Product> prodList = shopService.getAllProductsAll();
-            return ResponseEntity.ok(new ApiResponse<>(200, "Success", prodList));
+            return ResponseEntity.ok(new ApiResponse<>(200, "AllProducts", prodList));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }

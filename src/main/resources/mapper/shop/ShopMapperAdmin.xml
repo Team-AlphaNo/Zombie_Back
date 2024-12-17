@@ -4,7 +4,7 @@
 <mapper namespace="com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper">
     <select id="getProductListAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopListDto" resultType="com.teamalphano.zombieboom.model.shop.Product">
       SELECT
-            prod.prod_no
+            prod.prod_no,
             prod.prod_id,
             lang.prod_name,
             lang.prod_desc,

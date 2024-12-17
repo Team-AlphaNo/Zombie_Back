@@ -1,4 +1,4 @@
-   package com.teamalphano.zombieboom;
+package com.teamalphano.zombieboom;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.TimeZone;
 
-   @SpringBootApplication
+@SpringBootApplication
 @Slf4j
-@MapperScan("com.teamalphano.zombieboom")
+@MapperScan(basePackages = "com.teamalphano.zombieboom.mapper") // MyBatis Mapper만 스캔
 public class ZombieBoomApplication {
 
 	public static void main(String[] args) {
