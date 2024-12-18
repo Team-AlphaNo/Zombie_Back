@@ -1,7 +1,7 @@
 package com.teamalphano.zombieboom.controller.user;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
-import com.teamalphano.zombieboom.dto.user.UserBuyDto;
+import com.teamalphano.zombieboom.dto.user.UserBuyParamsDto;
 import com.teamalphano.zombieboom.model.user.UserData;
 import com.teamalphano.zombieboom.service.user.UserDataService;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,12 @@ public class UserDataController {
 
     //아이템 구입
     @PostMapping("/buy")
-    public ResponseEntity<ApiResponse<UserData>> buyProduct(@RequestBody UserBuyDto userBuyDto) {
-        if(userBuyDto.getUserNo() == 0 || userBuyDto.getProdId() == null){
+    public ResponseEntity<ApiResponse<UserData>> buyProduct(@RequestBody UserBuyParamsDto userBuyParamsDto) {
+        if(userBuyParamsDto.getUserNo() == 0 || userBuyParamsDto.getProdId() == null){
             ResponseEntity.badRequest().body(new ApiResponse<>(400, "Bad Request 400", null));
         }
         try{
-            UserData userData = userDataService.buyProduct(userBuyDto);
+            UserData userData = userDataService.buyProduct(userBuyParamsDto);
             if(userData != null){
                 return ResponseEntity.ok(new ApiResponse<>(200, "Success", userData));
             }else{

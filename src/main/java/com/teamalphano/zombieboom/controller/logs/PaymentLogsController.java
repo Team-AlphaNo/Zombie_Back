@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user/logs")
+@RequestMapping("/log/purchase")
 public class PaymentLogsController {
     private final PaymentLogsService paymentLogsService;
 
@@ -26,5 +26,27 @@ public class PaymentLogsController {
         }catch (Exception e) {
             return ResponseEntity.status(500).body( null);
         }
+    }
+
+    @PostMapping("/ready")
+    public ResponseEntity<ApiResponse<String>> insertPurchaseLogReady(
+            @RequestBody
+            ) {
+
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<ApiResponse<String>> insertPurchaseLogReady(
+            @RequestBody
+            ) {
+
+    }
+
+    // Temparory added : 2024.12.18. 11:10. JHH
+    @PostMapping("/insert")
+    public ResponseEntity<ApiResponse<PaymentLog>> insertPaymentLog(
+            @RequestBody PaymentLog paymentLog
+    ) {
+
     }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class PurchaseDto{
     private String purchaseToken;
-    private String productID;
-    private Integer type;
+    private String prodID;
+    private Integer userNo;
+    private String transactionId;
 }
