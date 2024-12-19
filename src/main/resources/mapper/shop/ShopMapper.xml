@@ -84,7 +84,7 @@
             prod.prod_no = #{prodNo}
     </select>
 
-    <select id="getProductDetail" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
+    <select id="getProductDetailById" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
         SELECT
             prod.prod_no,
             prod.prod_id,
@@ -119,6 +119,44 @@
             )
             AND prod.prod_active = true
             AND prod.prod_id = #{prodId}
+            AND lang.lang_type = #{langType}
+    </select>
+
+    <select id="getProductDetailByNo" parameterType="com.teamalphano.zombieboom.model.shop.Product" resultType="com.teamalphano.zombieboom.model.shop.Product">
+        SELECT
+            prod.prod_no,
+            prod.prod_id,
+            lang.prod_name,
+            lang.prod_desc,
+            prod.prod_price,
+            prod.prod_price_type,
+            prod.prod_type,
+            prod.prod_limit,
+            prod.prod_start_date,
+            prod.prod_end_date,
+            prod.prod_purchase_limit,
+            prod.prod_purchase_count,
+            prod.prod_ordr,
+            prod.prod_active,
+            prod.unity_prod_type,
+            prod.prod_img_key
+        FROM
+            tb_product prod
+        INNER JOIN
+            tb_product_lang lang
+            on lang.prod_no = prod.prod_no
+        WHERE
+            1=1
+            AND (
+                (prod.prod_end_date IS NOT NULL
+                AND prod.prod_start_date &lt;= NOW()
+                AND NOW() &lt; prod.prod_end_date)
+            OR
+                (prod.prod_end_date IS NULL
+                AND prod.prod_start_date &lt;= NOW())
+            )
+            AND prod.prod_active = true
+            AND prod.prod_no = #{prodNo}
             AND lang.lang_type = #{langType}
     </select>
 

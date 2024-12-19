@@ -1,5 +1,6 @@
 package com.teamalphano.zombieboom.mapper.shop;
 
+import com.teamalphano.zombieboom.dto.purchase.UpdateProdPurchaseDto;
 import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
 import com.teamalphano.zombieboom.dto.shop.ShopListDto;
 import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
@@ -36,4 +37,6 @@ public interface ShopAdminMapper {
     //상품 언어 수정
     void updateProductLang(ProductLang productLang);
 
+    //구입시 상품 정보 수정
+    void updateProductAfterPurchase(UpdateProdPurchaseDto updateProdPurchaseDto);
 }

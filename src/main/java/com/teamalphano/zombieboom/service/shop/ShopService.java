@@ -6,6 +6,7 @@ import com.teamalphano.zombieboom.model.shop.ProductItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,13 +42,14 @@ public class ShopService {
         return products;
     }
 
-    //특정 상품 한개 조회 - engine
-    public Product getProductDetail(Integer prodNo, String langType){
+    //특정 상품 한개 조회 - engine prodNo으로
+    @Transactional
+    public Product getProductDetailByNo(Integer prodNo, String langType){
         Product productParam = new Product();
         productParam.setProdNo(prodNo);
         productParam.setLangType(langType);
 
-        Product product = shopMapper.getProductDetail(productParam);
+        Product product = shopMapper.getProductDetailByNo(productParam);
         if (product != null) {
             List<ProductItem> items = shopMapper.getProductItemByNo(prodNo);
             product.setItems(items);
@@ -56,6 +58,24 @@ public class ShopService {
         }
         return product;
     }
+
+    //특정 상품 한개 조회 - engine prodId으로
+    @Transactional
+    public Product getProductDetailById(String prodId, String langType){
+        Product productParam = new Product();
+        productParam.setProdId(prodId);
+        productParam.setLangType(langType);
+
+        Product product = shopMapper.getProductDetailById(productParam);
+        if (product != null) {
+            List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
+            product.setItems(items);
+        }else{
+            System.out.println("상품 없음");
+        }
+        return product;
+    }
+
 
     // 상품 리스트 조회
     public List<Product> getAllProductsAll() {

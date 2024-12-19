@@ -17,7 +17,8 @@ public interface ShopMapper {
     List<ProductItem> getProductItemByNo(Integer prodNo);
     
     //특정 상품 상세 조회
-    Product getProductDetail(Product product);
+    Product getProductDetailById(Product product);
+    Product getProductDetailByNo(Product product);
 
     //구매 후 상점 데이터 업데이트
     int updateProductAfterPurchase(UserBuyDto userBuyDto);

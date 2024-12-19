@@ -44,7 +44,7 @@ public class ShopController {
             @RequestParam(value = "prodNo", required = true) Integer prodNo,
             @RequestParam(value = "langType", required = false, defaultValue = "ko") String langType) {
         try {
-            Product prod = shopService.getProductDetail(prodNo, langType);
+            Product prod = shopService.getProductDetailByNo(prodNo, langType);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", prod));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));

@@ -129,4 +129,13 @@
             lang.prod_no = #{prodNo}
             AND lang.lang_type = #{langType}
     </update>
+
+    <update id="updateProductAfterPurchase" parameterType="com.teamalphano.zombieboom.dto.purchase.UpdateProdPurchaseDto">
+        UPDATE
+            tb_product prod
+        SET
+            prod.prod_purchase_limit = #{prodPurchaseLimit}
+        WHERE
+            prod.prod_no = #{prodNo}
+    </update>
 </mapper>

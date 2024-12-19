@@ -1,5 +1,6 @@
 package com.teamalphano.zombieboom.service.shop;
 
+import com.teamalphano.zombieboom.dto.purchase.UpdateProdPurchaseDto;
 import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
 import com.teamalphano.zombieboom.dto.shop.ShopListDto;
 import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
@@ -81,6 +82,10 @@ public class ShopAdminService {
             return "fail";
         }
     }
-    
+
+    //구입해서 상품 데이터 업데이트
+    public void updateProductAfterPurchase(UpdateProdPurchaseDto updateProdPurchaseDto){
+        shopAdminMapper.updateProductAfterPurchase(updateProdPurchaseDto);
+    }
 
 }

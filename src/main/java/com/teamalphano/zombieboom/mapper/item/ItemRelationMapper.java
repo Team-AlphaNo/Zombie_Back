@@ -1,6 +1,7 @@
 package com.teamalphano.zombieboom.mapper.item;
 
 import com.teamalphano.zombieboom.dto.item.RelationDto;
+import com.teamalphano.zombieboom.dto.purchase.UpdateProdPurchaseDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

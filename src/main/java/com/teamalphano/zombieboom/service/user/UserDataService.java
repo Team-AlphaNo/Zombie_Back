@@ -1,11 +1,10 @@
 package com.teamalphano.zombieboom.service.user;
 
 import com.teamalphano.zombieboom.common.CharStringEdit;
-import com.teamalphano.zombieboom.dto.logs.PaymentCreateDto;
+import com.teamalphano.zombieboom.dto.purchase.DeductAmountDto;
+import com.teamalphano.zombieboom.dto.purchase.PurchaseGrantDto;
 import com.teamalphano.zombieboom.dto.user.UserBuyDto;
-import com.teamalphano.zombieboom.dto.user.UserBuyParamsDto;
 import com.teamalphano.zombieboom.mapper.item.ItemMapper;
-import com.teamalphano.zombieboom.mapper.logs.PaymentLogsMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
 import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
 import com.teamalphano.zombieboom.model.item.ItemData;
@@ -13,6 +12,7 @@ import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductItem;
 import com.teamalphano.zombieboom.model.user.UserData;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -24,47 +24,38 @@ public class UserDataService {
     private final UserDataMapper userDataMapper;
     private final ShopMapper shopMapper;
     private final ItemMapper itemMapper;
-    private final PaymentLogsMapper paymentLogsMapper;
 
     public UserDataService(
             UserDataMapper userDataMapper,
             ShopMapper shopMapper,
-            ItemMapper itemMapper,
-            PaymentLogsMapper paymentLogdMapper
+            ItemMapper itemMapper
     ) {
         this.userDataMapper = userDataMapper;
         this.shopMapper = shopMapper;
         this.itemMapper = itemMapper;
-        this.paymentLogsMapper = paymentLogdMapper;
     }
 
+    //상품 구입 - 금액 차감
+    @Transactional
+    public boolean deductAmount(DeductAmountDto deductAmountDto){
+        int deduct = userDataMapper.deductUserCoin(deductAmountDto);
+        return deduct > 0;
+    }
+
+
     //상품 구입 - 코인
-    public UserData buyProduct(UserBuyParamsDto userBuyParamsDto) {
-        Product product = checkProduct(userBuyParamsDto.getProdId());
+    @Transactional
+    public UserData userGrantProduct(PurchaseGrantDto purchaseGrantDto) {
+        Product product = checkProduct(purchaseGrantDto.getProdId());
         if(product != null) {
             UserBuyDto userBuyDto = buyProdCheck(product);
             userBuyDto.setProdNo(product.getProdNo());
-            userBuyDto.setUserNo(userBuyParamsDto.getUserNo());
+            userBuyDto.setUserNo(purchaseGrantDto.getUserNo());
 
             //유저 데이터 갱신
             int updateUserData = userDataMapper.updateUserDataAfterPurchase(userBuyDto);
-            if(updateUserData > 0){
-                //상점 데이터 갱신
-                int updateProdData = shopMapper.updateProductAfterPurchase(userBuyDto);
-                if(updateProdData > 0){
-                    //갱신한 유저 데이터 조회
-                    PaymentCreateDto paymentCreateDto = new PaymentCreateDto();
-                    paymentCreateDto.setUserNo(userBuyDto.getUserNo());
-                    paymentCreateDto.setPaymentStatus(true);
-                    paymentCreateDto.setProdNo(product.getProdNo());
-
-                    // 구입 로그 추가
-                    paymentLogsMapper.insertPaymentLog(paymentCreateDto);
-                    UserData userData = userDataMapper.getUserData(userBuyDto.getUserNo());
-                    return addCharDataToUserData(userData);
-                }else{
-                    return null;
-                }
+            if(updateUserData > 0) {
+                return getUserData(userBuyDto.getUserNo());
             }else {
                 return null;
             }
@@ -78,7 +69,7 @@ public class UserDataService {
         productParam.setProdId(prodId);
 
         //상품 상세 데이터
-        Product product = shopMapper.getProductDetail(productParam);
+        Product product = shopMapper.getProductDetailById(productParam);
         if (product != null) {
             if(product.isProdLimit() && product.getProdPurchaseCount()<=0){
                 System.out.println("상품 다 팔림");

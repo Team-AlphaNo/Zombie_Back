@@ -39,7 +39,7 @@
 
     <update id="updateUserData" parameterType="com.teamalphano.zombieboom.dto.user.UpdateUserDataDto">
         UPDATE
-        tb_user_data data
+            tb_user_data data
         SET
         <trim suffixOverrides=",">
             <if test="userTicket != null">
@@ -60,5 +60,14 @@
         </trim>
         WHERE
         data.userNo = #{userNo}
+    </update>
+
+    <update id="deductUserCoin" parameterType="com.teamalphano.zombieboom.dto.purchase.DeductAmountDto">
+        UPDATE
+            tb_user_data data
+        SET
+            data.user_money = #{amount}
+        WHERE
+            data.user_no = #{userNo}
     </update>
 </mapper>

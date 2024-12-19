@@ -27,26 +27,4 @@ public class PaymentLogsController {
             return ResponseEntity.status(500).body( null);
         }
     }
-
-    @PostMapping("/ready")
-    public ResponseEntity<ApiResponse<String>> insertPurchaseLogReady(
-            @RequestBody
-            ) {
-
-    }
-
-    @PostMapping("/complete")
-    public ResponseEntity<ApiResponse<String>> insertPurchaseLogReady(
-            @RequestBody
-            ) {
-
-    }
-
-    // Temparory added : 2024.12.18. 11:10. JHH
-    @PostMapping("/insert")
-    public ResponseEntity<ApiResponse<PaymentLog>> insertPaymentLog(
-            @RequestBody PaymentLog paymentLog
-    ) {
-
-    }
 }

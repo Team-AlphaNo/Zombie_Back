@@ -1,9 +1,10 @@
 package com.teamalphano.zombieboom.service.logs;
 
-import com.teamalphano.zombieboom.dto.logs.PaymentCreateDto;
+import com.teamalphano.zombieboom.dto.logs.CreatePaymentLogDto;
 import com.teamalphano.zombieboom.mapper.logs.PaymentLogsMapper;
 import com.teamalphano.zombieboom.model.logs.PaymentLog;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,15 +16,24 @@ public class PaymentLogsService {
         this.paymentLogsMapper = paymentLogsMapper;
     }
 
+    @Transactional
     public List<PaymentLog> getPaymentLogsList(){
         return paymentLogsMapper.getPaymentLogsList();
     }
 
-    public void insertPaymentLog(PaymentCreateDto paymentCreateDto){
-        paymentLogsMapper.insertPaymentLog(paymentCreateDto);
+    @Transactional
+    public boolean insertPaymentLog(CreatePaymentLogDto createPaymentLogDto){
+        int insert = paymentLogsMapper.insertPaymentLog(createPaymentLogDto);
+        if(insert > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
-    public void updatePaymentLog(PaymentCreateDto paymentCreateDto){
-        paymentLogsMapper.updatePaymentLog(paymentCreateDto);
+    @Transactional
+    public void updateLogMessage(CreatePaymentLogDto createPaymentLogDto){
+        paymentLogsMapper.updateLogMessage(createPaymentLogDto);
     }
+
 }

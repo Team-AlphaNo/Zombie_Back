@@ -25,18 +25,19 @@
 
     <insert id="insertPaymentLog" parameterType="com.teamalphano.zombieboom.dto.logs.PaymentCreateDto" useGeneratedKeys="true" keyProperty="paymentLogsNo">
         INSERT INTO tb_logs_payment
-            (user_no, create_date, payment_status, transaction_id, prod_no)
+            (user_no, create_date, payment_status, transaction_id, prod_no, type)
         values
-            (#{userNo}, now(), 'progress', #{transactionId}, #{prodNo})
+            (#{userNo}, now(), #{paymentStatus}, #{transactionId}, #{prodNo}, #{type})
     </insert>
 
-    <update id="updatePaymentLog" parameterType="com.teamalphano.zombieboom.dto.logs.PaymentCreateDto">
+    <update id="updateLogMessage" parameterType="com.teamalphano.zombieboom.dto.logs.PaymentCreateDto">
         UPDATE
             tb_logs_payment paylog
         SET
             paylog.payment_status = #{paymentStatus},
             paylog.update_date = now()
         WHERE
-            paylog.payment_logs_no = #{paymentLogsNo}
+            paylog.user_no = #{userNo}
+            AND paylog.transaction_id = #{transactionId}
     </update>
 </mapper>
