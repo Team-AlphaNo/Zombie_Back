@@ -23,14 +23,14 @@
             tb_user_info user on user.user_no = pay.user_no
     </select>
 
-    <insert id="insertPaymentLog" parameterType="com.teamalphano.zombieboom.dto.logs.PaymentCreateDto" useGeneratedKeys="true" keyProperty="paymentLogsNo">
+    <insert id="insertPaymentLog" parameterType="com.teamalphano.zombieboom.dto.logs.CreatePaymentLogDto" useGeneratedKeys="true" keyProperty="paymentLogsNo">
         INSERT INTO tb_logs_payment
             (user_no, create_date, payment_status, transaction_id, prod_no, type)
         values
             (#{userNo}, now(), #{paymentStatus}, #{transactionId}, #{prodNo}, #{type})
     </insert>
 
-    <update id="updateLogMessage" parameterType="com.teamalphano.zombieboom.dto.logs.PaymentCreateDto">
+    <update id="updateLogMessage" parameterType="com.teamalphano.zombieboom.dto.logs.CreatePaymentLogDto">
         UPDATE
             tb_logs_payment paylog
         SET
