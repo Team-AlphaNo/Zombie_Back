@@ -1,11 +1,10 @@
-package com.teamalphano.zombieboom.mapper.reword;
+package com.teamalphano.zombieboom.mapper.reward;
 
-import com.teamalphano.zombieboom.dto.reword.RewordParams;
-import com.teamalphano.zombieboom.dto.reword.RewordUpdateParams;
+import com.teamalphano.zombieboom.dto.reward.RewardUpdateParams;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RewordMapper {
-    int giveRewardToCoin(RewordUpdateParams rewordUpdateParams);
-    int giveRewardToTicket(RewordUpdateParams rewordUpdateParams);
+public interface RewardMapper {
+    int giveRewardToCoin(RewardUpdateParams rewardUpdateParams);
+    int giveRewardToTicket(RewardUpdateParams rewardUpdateParams);
 }

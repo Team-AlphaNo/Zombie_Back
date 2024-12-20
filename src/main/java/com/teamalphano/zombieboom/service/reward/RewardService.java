@@ -1,42 +1,42 @@
-package com.teamalphano.zombieboom.service.reword;
+package com.teamalphano.zombieboom.service.reward;
 
-import com.teamalphano.zombieboom.dto.reword.RewordParams;
-import com.teamalphano.zombieboom.dto.reword.RewordUpdateParams;
+import com.teamalphano.zombieboom.dto.reward.RewardParams;
+import com.teamalphano.zombieboom.dto.reward.RewardUpdateParams;
 import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
-import com.teamalphano.zombieboom.mapper.reword.RewordMapper;
+import com.teamalphano.zombieboom.mapper.reward.RewardMapper;
 import com.teamalphano.zombieboom.service.user.UserDataService;
 import com.teamalphano.zombieboom.service.user.UserInfoService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RewordService {
+public class RewardService {
     private final UserInfoService userInfoService;
     private final UserDataService userDataService;
-    private final RewordMapper rewordMapper;
-    public RewordService(UserInfoService userInfoService,
-                         RewordMapper rewordMapper, UserDataService userDataService) {
+    private final RewardMapper rewardMapper;
+    public RewardService(UserInfoService userInfoService,
+                         RewardMapper rewardMapper, UserDataService userDataService) {
         this.userInfoService = userInfoService;
-        this.rewordMapper = rewordMapper;
+        this.rewardMapper = rewardMapper;
         this.userDataService = userDataService;
     }
 
-    public UserFullDataDto getRewordByType(RewordParams rewordParams) {
+    public UserFullDataDto getRewardByType(RewardParams rewardParams) {
         //유저 데이터 업데이트
-        userDataService.userDataUpdateByFullData(rewordParams.getUserFullData());
+        userDataService.userDataUpdateByFullData(rewardParams.getUserFullData());
 
-        RewordUpdateParams rewordUpdateParams = new RewordUpdateParams();
-        rewordUpdateParams.setAmount(rewordParams.getAmount());
-        rewordUpdateParams.setUserNo(rewordParams.getUserFullData().getUserInfo().getUserNo());
+        RewardUpdateParams rewardUpdateParams = new RewardUpdateParams();
+        rewardUpdateParams.setAmount(rewardParams.getAmount());
+        rewardUpdateParams.setUserNo(rewardParams.getUserFullData().getUserInfo().getUserNo());
 
-        if(rewordParams.getType() == 0 ){
+        if(rewardParams.getType() == 0 ){
         //코인 리워드 지급
-            int reworded = rewordMapper.giveRewardToCoin(rewordUpdateParams);
+            int reworded = rewardMapper.giveRewardToCoin(rewardUpdateParams);
             if(reworded==0){
                 return null;
             }
-        }else if(rewordParams.getType() == 1){
+        }else if(rewardParams.getType() == 1){
         //티켓 리워드 지급
-            int reworded = rewordMapper.giveRewardToTicket(rewordUpdateParams);
+            int reworded = rewardMapper.giveRewardToTicket(rewardUpdateParams);
             if(reworded==0){
                 return null;
             }
@@ -44,6 +44,6 @@ public class RewordService {
             return null;
         }
 
-        return userInfoService.getUserFullData(rewordUpdateParams.getUserNo());
+        return userInfoService.getUserFullData(rewardUpdateParams.getUserNo());
     }
 }
