@@ -4,8 +4,8 @@ import com.google.api.services.androidpublisher.model.ProductPurchase;
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.logs.CreatePaymentLogDto;
 import com.teamalphano.zombieboom.dto.purchase.*;
-import com.teamalphano.zombieboom.model.shop.Product;
-import com.teamalphano.zombieboom.model.user.UserData;
+import com.teamalphano.zombieboom.dto.shop.ProductDto;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import com.teamalphano.zombieboom.service.logs.PaymentLogsService;
 import com.teamalphano.zombieboom.service.purchase.PurchaseService;
 import com.teamalphano.zombieboom.service.shop.ShopAdminService;
@@ -78,10 +78,10 @@ public class PurchaseController {
 
         String message = "Processing";
         PurchaseResponseDto responseData = new PurchaseResponseDto();
-        responseData.setUserData(null);
+        responseData.setUserDataDto(null);
 
         try {
-            Product prod = shopService.getProductDetailById(prodId, "ko");
+            ProductDto prod = shopService.getProductDetailById(prodId, "ko");
             if (prod == null) {
                 message = "Product not found";
                 responseData.setPurchaseStatus(message);
@@ -112,11 +112,11 @@ public class PurchaseController {
             PurchaseGrantDto purchaseGrantDto = new PurchaseGrantDto();
             purchaseGrantDto.setUserNo(userNo);
             purchaseGrantDto.setProdId(prodId);
-            UserData userData = userDataService.userGrantProduct(purchaseGrantDto);
-            updatePaymentLog(createPaymentLogDto, userData!=null ? "GRANTED" : "GRANTED_FAIL");
+            UserDataDto userDataDto = userDataService.userGrantProduct(purchaseGrantDto);
+            updatePaymentLog(createPaymentLogDto, userDataDto !=null ? "GRANTED" : "GRANTED_FAIL");
 
-            responseData.setUserData(userData);
-            return ResponseEntity.ok(new ApiResponse<>(200, userData!=null ? "GRANTED" : "GRANTED_FAIL", responseData));
+            responseData.setUserDataDto(userDataDto);
+            return ResponseEntity.ok(new ApiResponse<>(200, userDataDto !=null ? "GRANTED" : "GRANTED_FAIL", responseData));
         } catch (Exception e) {
             message = "Exception occurred: " + e.getMessage();
             responseData.setPurchaseStatus(message);
@@ -124,7 +124,7 @@ public class PurchaseController {
         }
     }
 
-    private CreatePaymentLogDto initializePaymentLog(Integer userNo, Product prod, String transactionId, String paymentType) {
+    private CreatePaymentLogDto initializePaymentLog(Integer userNo, ProductDto prod, String transactionId, String paymentType) {
         CreatePaymentLogDto createPaymentLogDto = new CreatePaymentLogDto();
         createPaymentLogDto.setUserNo(userNo);
         createPaymentLogDto.setProdNo(prod.getProdNo());
@@ -141,7 +141,7 @@ public class PurchaseController {
         return isValid;
     }
 
-    private void updateProductPurchaseLimit(Product prod) {
+    private void updateProductPurchaseLimit(ProductDto prod) {
         UpdateProdPurchaseDto updateProdPurchaseDto = new UpdateProdPurchaseDto();
         updateProdPurchaseDto.setProdNo(prod.getProdNo());
         updateProdPurchaseDto.setProdPurchaseLimit(prod.getProdPurchaseLimit() - 1);

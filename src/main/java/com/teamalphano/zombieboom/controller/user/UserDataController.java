@@ -1,7 +1,7 @@
 package com.teamalphano.zombieboom.controller.user;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
-import com.teamalphano.zombieboom.model.user.UserData;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import com.teamalphano.zombieboom.service.user.UserDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +15,11 @@ public class UserDataController {
 
     //유저 데이터 상세
     @GetMapping("/detail")
-    public ResponseEntity<ApiResponse<UserData>> getUserData(@RequestParam(value = "userNo", required = true) Integer userNo) {
+    public ResponseEntity<ApiResponse<UserDataDto>> getUserData(@RequestParam(value = "userNo", required = true) Integer userNo) {
         try{
-            UserData userData = userDataService.getUserData(userNo);
-            if(userData != null){
-                return ResponseEntity.ok(new ApiResponse<>(200, "Success", userData));
+            UserDataDto userDataDto = userDataService.getUserData(userNo);
+            if(userDataDto != null){
+                return ResponseEntity.ok(new ApiResponse<>(200, "Success", userDataDto));
             }else{
                 return ResponseEntity.status(404).body(new ApiResponse<>(404, "Not Found", null));
             }
@@ -27,4 +27,5 @@ public class UserDataController {
             return ResponseEntity.status(500).body(new ApiResponse<>(500 , "Internal server error", null));
         }
     }
+
 }

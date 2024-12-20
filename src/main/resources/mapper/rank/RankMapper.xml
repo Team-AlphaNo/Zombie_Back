@@ -3,70 +3,108 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.teamalphano.zombieboom.mapper.rank.RankMapper">
-    <select id="getWorldTotalRankList" resultType="com.teamalphano.zombieboom.model.rank.WorldRank">
+    <select id="getWorldTotalRankList" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
         SELECT
             ran.rank_no,
             ran.user_no,
             ran.rank_value,
             ran.create_date,
             user.user_id,
-            user.user_name
+            user.user_name,
+            ROW_NUMBER() OVER (PARTITION BY ran.user_no ORDER BY ran.rank_value DESC) AS row_num
         FROM
-            tb_rank as ran
+            tb_rank AS ran
         INNER JOIN
-            tb_user_info as user
-            on user.user_no = ran.user_no
+            tb_user_info AS user
+            ON user.user_no = ran.user_no
+        )
+        SELECT
+            rank_no,
+            user_no,
+            rank_value,
+            create_date,
+            user_id,
+            user_name
+        FROM
+            RankedRanks
         WHERE
-            1=1
+            row_num = 1
         ORDER BY
-            ran.rank_value DESC
+            rank_value DESC
         LIMIT 50;
     </select>
 
-    <select id="getWorldMonthRankList" resultType="com.teamalphano.zombieboom.model.rank.WorldRank">
+    <select id="getWorldMonthRankList" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
         SELECT
             ran.rank_no,
             ran.user_no,
             ran.rank_value,
             ran.create_date,
             user.user_id,
-            user.user_name
+            user.user_name,
+            ROW_NUMBER() OVER (
+                PARTITION BY ran.user_no
+                ORDER BY ran.rank_value DESC
+            ) AS row_num
         FROM
-            tb_rank as ran
+            tb_rank AS ran
         INNER JOIN
-            tb_user_info as user
-            on user.user_no = ran.user_no
+            tb_user_info AS user
+            ON user.user_no = ran.user_no
         WHERE
-            CASE
-                WHEN DAY(CURDATE()) = 1 THEN
-                    ran.create_date BETWEEN
-                        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01 05:00:00') AND
-                        DATE_FORMAT(CURDATE(), '%Y-%m-%d 04:59:59')
-                ELSE
-                    ran.create_date BETWEEN
-                        CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-01'), ' 05:00:00') AND
-                        DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d 04:59:59')
-            END
+            (
+                CASE
+                    WHEN DAY(CURDATE()) = 1 THEN
+                        ran.create_date BETWEEN
+                            DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01 05:00:00') AND
+                            DATE_FORMAT(CURDATE(), '%Y-%m-%d 04:59:59')
+                    ELSE
+                        ran.create_date BETWEEN
+                            CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-01'), ' 05:00:00') AND
+                            DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d 04:59:59')
+                END
+            )
+        )
+        SELECT
+            rank_no,
+            user_no,
+            rank_value,
+            create_date,
+            user_id,
+            user_name
+        FROM
+            RankedRanks
+        WHERE
+            row_num = 1
         ORDER BY
-            ran.rank_value DESC;
+            rank_value DESC
+        LIMIT 50;
     </select>
 
-    <select id="getWorldDayRankList" resultType="com.teamalphano.zombieboom.model.rank.WorldRank">
-        SELECT
-            ran.rank_no,
-            ran.user_no,
-            ran.rank_value,
-            ran.create_date,
-            user.user_id,
-            user.user_name
-        FROM
-            tb_rank as ran
-        INNER JOIN
-            tb_user_info as user
-            on user.user_no = ran.user_no
-        WHERE
-            CASE
-                WHEN HOUR(NOW()) &lt; 5 THEN
+    <select id="getWorldDayRankList" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
+            SELECT
+                ran.rank_no,
+                ran.user_no,
+                ran.rank_value,
+                ran.create_date,
+                user.user_id,
+                user.user_name,
+                ROW_NUMBER() OVER (
+                PARTITION BY ran.user_no
+                ORDER BY ran.rank_value DESC
+            ) AS row_num
+            FROM
+                tb_rank AS ran
+            INNER JOIN
+                tb_user_info AS user
+                ON user.user_no = ran.user_no
+            WHERE
+            (
+                CASE
+                    WHEN HOUR(NOW()) &lt; 5 THEN
                     ran.create_date BETWEEN
                     CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 05:00:00') AND
                     CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 04:59:59')
@@ -75,14 +113,260 @@
                     CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 05:00:00') AND
                     CONCAT(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 04:59:59')
                 END
-            ORDER BY
-                ran.rank_value DESC;
+            )
+        )
+        SELECT
+            rank_no,
+            user_no,
+            rank_value,
+            create_date,
+            user_id,
+            user_name
+        FROM
+            RankedRanks
+        WHERE
+            row_num = 1
+        ORDER BY
+            rank_value DESC
+        LIMIT 50;
     </select>
 
     <insert id="insertRank" parameterType="com.teamalphano.zombieboom.dto.rank.RankInsertDto">
-        INSERT INTO tb_rank
-            (user_no, rank_value, create_date)
-        VALUES
-            (#{userNo} , #{rankValue}, now())
+        INSERT INTO tb_rank (user_no, rank_value, create_date)
+        VALUES (
+            #{userNo},
+            #{rankValue},
+            CASE
+                WHEN HOUR(NOW()) >= 5 THEN DATE(NOW())
+                ELSE DATE(DATE_SUB(NOW(), INTERVAL 1 DAY))
+            END
+        )
+        ON DUPLICATE KEY UPDATE
+            rank_value =
+            CASE
+                WHEN rank_value &lt; #{rankValue} THEN #{rankValue}
+            ELSE rank_value
+        END;
     </insert>
+
+    <select id="getMyRankTotal" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
+        SELECT
+            ran.rank_no,
+            ran.user_no,
+            ran.rank_value,
+            ran.create_date,
+            user.user_id,
+            user.user_name,
+            ROW_NUMBER() OVER (PARTITION BY ran.user_no ORDER BY ran.rank_value DESC) AS row_num
+        FROM
+            tb_rank AS ran
+        INNER JOIN
+            tb_user_info AS user
+            ON user.user_no = ran.user_no
+        ),
+        TopRanks AS (
+            SELECT
+                rank_no,
+                user_no,
+                rank_value,
+                create_date,
+                user_id,
+                user_name
+            FROM
+                RankedRanks
+            WHERE
+                row_num = 1
+            ORDER BY
+                rank_value DESC
+            LIMIT 50
+        ),
+        UserSpecificRank AS (
+            SELECT
+                rank_no,
+                user_no,
+                rank_value,
+                create_date,
+                user_id,
+                user_name
+            FROM
+                RankedRanks
+            WHERE
+                user_no = #{userNo} AND row_num = 1
+        )
+        SELECT
+            COALESCE(TopRanks.rank_no, '-') AS rank_no,
+            COALESCE(TopRanks.user_no, UserSpecificRank.user_no) AS user_no,
+            COALESCE(TopRanks.rank_value, '-') AS rank_value,
+            COALESCE(TopRanks.create_date, NULL) AS create_date,
+            COALESCE(TopRanks.user_id, UserSpecificRank.user_id) AS user_id,
+            COALESCE(TopRanks.user_name, UserSpecificRank.user_name) AS user_name
+        FROM
+            TopRanks
+        RIGHT JOIN
+            UserSpecificRank
+        ON
+            TopRanks.user_no = UserSpecificRank.user_no
+        ORDER BY
+            rank_value DESC
+        LIMIT 50;
+    </select>
+
+    <select id="getMyRankMonth" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
+            SELECT
+                ran.rank_no,
+                ran.user_no,
+                ran.rank_value,
+                ran.create_date,
+                user.user_id,
+                user.user_name,
+                ROW_NUMBER() OVER (
+                    PARTITION BY ran.user_no
+                    ORDER BY ran.rank_value DESC
+                ) AS row_num
+            FROM
+                tb_rank AS ran
+            INNER JOIN
+                tb_user_info AS user
+                ON user.user_no = ran.user_no
+            WHERE
+                (
+                    CASE
+                        WHEN DAY(CURDATE()) = 1 THEN
+                            ran.create_date BETWEEN
+                                DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01 05:00:00') AND
+                                DATE_FORMAT(CURDATE(), '%Y-%m-%d 04:59:59')
+                        ELSE
+                            ran.create_date BETWEEN
+                                CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-01'), ' 05:00:00') AND
+                                DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d 04:59:59')
+                    END
+                )
+        ),
+        TopRanks AS (
+            SELECT
+                rank_no,
+                user_no,
+                rank_value,
+                create_date,
+                user_id,
+                user_name
+            FROM
+                RankedRanks
+            WHERE
+                row_num = 1
+            ORDER BY
+                rank_value DESC
+            LIMIT 50
+        ),
+        UserSpecificRank AS (
+            SELECT
+                rank_no,
+                user_no,
+                rank_value,
+                create_date,
+                user_id,
+                user_name
+            FROM
+                RankedRanks
+            WHERE
+                user_no = #{userNo} AND row_num = 1
+        )
+        SELECT
+            COALESCE(TopRanks.rank_no, '-') AS rank_no,
+            COALESCE(TopRanks.user_no, UserSpecificRank.user_no) AS user_no,
+            COALESCE(TopRanks.rank_value, '-') AS rank_value,
+            COALESCE(TopRanks.create_date, NULL) AS create_date,
+            COALESCE(TopRanks.user_id, UserSpecificRank.user_id) AS user_id,
+            COALESCE(TopRanks.user_name, UserSpecificRank.user_name) AS user_name
+        FROM
+            TopRanks
+        RIGHT JOIN
+            UserSpecificRank
+        ON
+            TopRanks.user_no = UserSpecificRank.user_no
+        ORDER BY
+            rank_value DESC
+        LIMIT 50;
+    </select>
+
+    <select  id="getMyRankDay" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
+        WITH RankedRanks AS (
+                SELECT
+                    ran.rank_no,
+                    ran.user_no,
+                    ran.rank_value,
+                    ran.create_date,
+                    user.user_id,
+                    user.user_name,
+                    ROW_NUMBER() OVER (
+                    PARTITION BY ran.user_no
+                    ORDER BY ran.rank_value DESC
+                ) AS row_num
+                FROM
+                    tb_rank AS ran
+                INNER JOIN
+                    tb_user_info AS user
+                    ON user.user_no = ran.user_no
+                WHERE
+                (
+                    CASE
+                        WHEN HOUR(NOW()) &lt; 5 THEN
+                        ran.create_date BETWEEN
+                        CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 05:00:00') AND
+                        CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 04:59:59')
+                    ELSE
+                        ran.create_date BETWEEN
+                        CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 05:00:00') AND
+                        CONCAT(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 04:59:59')
+                        END
+                )
+            ),
+            TopRanks AS (
+                SELECT
+                    rank_no,
+                    user_no,
+                    rank_value,
+                    create_date,
+                    user_id,
+                    user_name
+                FROM
+                    RankedRanks
+                WHERE
+                    row_num = 1
+                ORDER BY
+                    rank_value DESC
+                LIMIT 50
+            ),
+            UserSpecificRank AS (
+                SELECT
+                    rank_no,
+                    user_no,
+                    rank_value,
+                    create_date,
+                    user_id,
+                    user_name
+                FROM
+                    RankedRanks
+                WHERE
+                user_no = #{userNo} AND row_num = 1
+            )
+            SELECT
+                COALESCE(TopRanks.rank_no, '-') AS rank_no,
+                COALESCE(TopRanks.user_no, UserSpecificRank.user_no) AS user_no,
+                COALESCE(TopRanks.rank_value, '-') AS rank_value,
+                COALESCE(TopRanks.create_date, NULL) AS create_date,
+                COALESCE(TopRanks.user_id, UserSpecificRank.user_id) AS user_id,
+                COALESCE(TopRanks.user_name, UserSpecificRank.user_name) AS user_name
+            FROM
+                TopRanks
+            RIGHT JOIN
+                UserSpecificRank
+                ON
+                TopRanks.user_no = UserSpecificRank.user_no
+            ORDER BY
+            rank_value DESC
+        LIMIT 50;
+    </select>
 </mapper>

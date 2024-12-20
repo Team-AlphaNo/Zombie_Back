@@ -8,8 +8,10 @@ public class UserBuyDto {
     private String prodId;
     private Integer prodNo;
 
-    private String userTicketTimer;
     private String charList;
     private Integer coin;
     private Integer ticket;
+    private String uniqProdList;
+    private String timeTicketEndDate;
+    private String timeTicketRange;
 }

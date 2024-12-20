@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.teamalphano.zombieboom.mapper.reward.RewardMapper">
+    <update id="giveRewardToCoin" parameterType="com.teamalphano.zombieboom.dto.reward.RewardUpdateParams">
+        UPDATE
+            tb_user_data
+        SET
+            user_money = user_money + #{amount}
+        WHERE
+            user_no = #{userNo}
+    </update>
+
+    <update id="giveRewardToTicket" parameterType="com.teamalphano.zombieboom.dto.reward.RewardUpdateParams">
+        UPDATE
+            tb_user_data
+        SET
+            user_ticket = user_ticket + #{amount}
+        WHERE
+            user_no = #{userNo}
+    </update>
+</mapper>

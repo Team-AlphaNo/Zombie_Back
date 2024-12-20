@@ -17,56 +17,56 @@
             <if test="charList != null and charList != ''">
                 data.user_char_list = #{charList},
             </if>
-            <if test="userTickerTimer != null and userTickerTimer != ''">
-                data.user_ticket_timer = #{ticketTime}
+            <if test="uniqProdList != null and uniqProdList != ''">
+                data.uniq_prod_list = #{uniqProdList},
+            </if>
+            <if test="timeTicketRange != null and timeTicketRange != ''">
+                data.time_ticket_end_date =
+                    CASE
+                        WHEN data.time_ticket_end_date IS NULL THEN now() + CAST(#{timeTicketRange} AS TIME)
+                        ELSE data.time_ticket_end_date + CAST(#{timeTicketRange} AS TIME)
+                    END
             </if>
         </set>
-        WHERE data.user_no = #{userNo}
+        WHERE
+            data.user_no = #{userNo}
     </update>
 
-    <select id="getUserData" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
+    <select id="getUserData" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.user.UserDataDto">
         SELECT
             data.user_no,
             data.user_money,
             data.user_ticket,
-            data.user_ticket_timer,
-            data.user_char_list
+            data.user_char_list,
+            data.uniq_prod_list,
+            data.time_ticket_end_date
         FROM
             tb_user_data data
         WHERE
             data.user_no = #{userNo}
     </select>
 
-    <update id="updateUserData" parameterType="com.teamalphano.zombieboom.dto.user.UpdateUserDataDto">
-        UPDATE
-            tb_user_data data
-        SET
-        <trim suffixOverrides=",">
-            <if test="userTicket != null">
-                data.user_ticket = #{userTicket},
-            </if>
-            <if test="userMoney != null">
-                data.user_money = #{userMoney},
-            </if>
-            <if test="userCharList != null and userCharList != ''">
-                data.user_char_list = #{userCharList},
-            </if>
-            <if test="userTicketTimer != null and userTicketTimer != ''">
-                data.user_ticket_timer = #{userTicketTimer},
-            </if>
-            <if test="userSelectChar != null and userSelectChar != ''">
-                data.user_select_char = #{userSelectChar}
-            </if>
-        </trim>
-        WHERE
-        data.userNo = #{userNo}
-    </update>
-
     <update id="deductUserCoin" parameterType="com.teamalphano.zombieboom.dto.purchase.DeductAmountDto">
         UPDATE
             tb_user_data data
         SET
             data.user_money = #{amount}
+        WHERE
+            data.user_no = #{userNo}
+    </update>
+
+    <update id="updateUserData" parameterType="com.teamalphano.zombieboom.dto.user.UpdateUserDataDto">
+        UPDATE
+            tb_user_data data
+        SET
+            data.user_money = #{userMoney}
+            , data.time_ticket_end_date = #{timeTicketEndDate}
+            <if test="userTicket != null and userTicket !=''">
+            , data.user_ticket = #{userTicket}
+            </if>
+            <if test="userSelectChar != null and userSelectChar != ''">
+            , data.user_select_char = #{userSelectChar}
+            </if>
         WHERE
             data.user_no = #{userNo}
     </update>

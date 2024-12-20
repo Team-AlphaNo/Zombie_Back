@@ -1,16 +1,15 @@
 package com.teamalphano.zombieboom.service.user;
 
-import com.teamalphano.zombieboom.dto.user.AdminUserListDto;
-import com.teamalphano.zombieboom.dto.user.UserLoginDto;
+import com.teamalphano.zombieboom.dto.user.admin.LoginParamsDto;
+import com.teamalphano.zombieboom.dto.user.admin.UserListParamsDto;
 import com.teamalphano.zombieboom.mapper.user.UserAdminMapper;
 import com.teamalphano.zombieboom.mapper.user.UserInfoMapper;
-import com.teamalphano.zombieboom.model.user.UserData;
-import com.teamalphano.zombieboom.model.user.UserFullData;
-import com.teamalphano.zombieboom.model.user.UserInfo;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
+import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
+import com.teamalphano.zombieboom.dto.user.UserInfoDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.util.List;
 
 @Service
@@ -23,28 +22,28 @@ public class UserAdminService {
 
     //관리자 유저 목록
     @Transactional
-    public List<UserInfo> getUserListAll(AdminUserListDto adminUserListDto) {
-        return userAdminMapper.getUserListAll(adminUserListDto);
+    public List<UserInfoDto> getUserListAll(UserListParamsDto userListParamsDto) {
+        return userAdminMapper.getUserListAll(userListParamsDto);
     }
 
     //관리자 로그인
     @Transactional
-    public UserInfo AdminLogin(UserLoginDto userLoginDto) {
-        UserInfo userInfo = userAdminMapper.getUserById(userLoginDto.getUserId());
-        if(userInfo.getUserPwd().equals(userLoginDto.getPassword())){
-            return userInfo;
+    public UserInfoDto AdminLogin(LoginParamsDto loginParamsDto) {
+        UserInfoDto userInfoDto = userAdminMapper.getUserById(loginParamsDto.getUserId());
+        if(userInfoDto.getUserPwd().equals(loginParamsDto.getPassword())){
+            return userInfoDto;
         }else{
             return null;
         }
     }
 
     @Transactional
-    public UserFullData getUserDataDetail(Integer userNo) {
-        UserFullData userFullData = new UserFullData();
-        UserInfo userInfo = userAdminMapper.getUserInfoByUserNo(userNo);
-        UserData userData = userAdminMapper.getUserDataByUserNo(userNo);
-        userFullData.setUserInfo(userInfo);
-        userFullData.setUserData(userData);
-        return userFullData;
+    public UserFullDataDto getUserDataDetail(Integer userNo) {
+        UserFullDataDto userFullDataDto = new UserFullDataDto();
+        UserInfoDto userInfoDto = userAdminMapper.getUserInfoByUserNo(userNo);
+        UserDataDto userDataDto = userAdminMapper.getUserDataByUserNo(userNo);
+        userFullDataDto.setUserInfo(userInfoDto);
+        userFullDataDto.setUserData(userDataDto);
+        return userFullDataDto;
     }
 }

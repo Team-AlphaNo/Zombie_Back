@@ -1,12 +1,12 @@
 package com.teamalphano.zombieboom.service.shop;
 
 import com.teamalphano.zombieboom.dto.purchase.UpdateProdPurchaseDto;
-import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
-import com.teamalphano.zombieboom.dto.shop.ShopListDto;
-import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
+import com.teamalphano.zombieboom.dto.shop.ProductDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdCreateParamsDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdListParamsDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdUpdateDto;
 import com.teamalphano.zombieboom.mapper.item.ItemRelationMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper;
-import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class ShopAdminService {
     }
 
     @Transactional
-    public List<Product> getProductListAdmin(ShopListDto shopListDto){
+    public List<ProductDto> getProductListAdmin(ProdListParamsDto shopListDto){
         //TODO: 검색조건 수정하기
         return shopAdminMapper.getProductListAdmin(shopListDto);
     }
@@ -42,8 +42,8 @@ public class ShopAdminService {
     }
 
     //상품 상세정보 등록
-    public String createProductAdmin(ShopCreateDto shopCreateDto){
-        int create = shopAdminMapper.createProductAdmin(shopCreateDto);
+    public String createProductAdmin(ProdCreateParamsDto prodCreateParamsDto){
+        int create = shopAdminMapper.createProductAdmin(prodCreateParamsDto);
         if(create>0){
             return "success";
         }else {
@@ -52,10 +52,10 @@ public class ShopAdminService {
     }
 
     //상품 상세 수정
-    public String updateProductDetailAdmin(ShopUpdateDto shopUpdateDto){
-        int update = shopAdminMapper.updateProductDetailAdmin(shopUpdateDto);
+    public String updateProductDetailAdmin(ProdUpdateDto prodUpdateDto){
+        int update = shopAdminMapper.updateProductDetailAdmin(prodUpdateDto);
 
-        List<ProductLang> langs = shopUpdateDto.getLangData();
+        List<ProductLang> langs = prodUpdateDto.getLangData();
         if(!langs.isEmpty()){
             for(int i=0; i<langs.size(); i++){
                 shopAdminMapper.updateProductLang(langs.get(i));

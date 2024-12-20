@@ -1,14 +1,13 @@
 package com.teamalphano.zombieboom.dto.shop;
 
-import com.teamalphano.zombieboom.model.shop.ProductLang;
+import com.teamalphano.zombieboom.model.shop.ProductItem;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ShopUpdateDto {
+public class ProductDto {
     private int prodNo;
-    private String prodId;
     private int prodPrice;
     private int prodPriceType;
     private int prodType;
@@ -20,6 +19,16 @@ public class ShopUpdateDto {
     private int prodOrdr;
     private boolean prodActive;
     private String prodImgKey;
+    private String prodId;
 
-    private List<ProductLang> langData;
+    private List<ProductItem> items;    //상세 아이템 list
+
+    //언어설정
+    private String langType;
+    private String prodName;
+    private String prodDesc;
+
+    private Integer unityProdType;
+    private boolean isUnique;       //일회성 여부
+    private boolean isPurchased;    //판매 완료 여부
 }

@@ -2,7 +2,7 @@ package com.teamalphano.zombieboom.controller.user;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.user.GoogleLoginDto;
-import com.teamalphano.zombieboom.model.user.UserFullData;
+import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
 import com.teamalphano.zombieboom.service.user.UserInfoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +18,13 @@ public class UserInfoController {
 
     //Guest 로그인
     @GetMapping("/guest/login")
-    public ResponseEntity<ApiResponse<UserFullData>> GuestLogin(
+    public ResponseEntity<ApiResponse<UserFullDataDto>> GuestLogin(
             @RequestParam(value = "uuid", required = true) String uuid ) {
         if (uuid == null || uuid.isEmpty()) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(404, "Missing 'uuid' parameter", null));
         }
         try {
-            UserFullData data = userInfoService.GuestLogin(uuid);
+            UserFullDataDto data = userInfoService.GuestLogin(uuid);
             if(data == null) {
                 return ResponseEntity.status(500).body(new ApiResponse<>(500, "SignIn guest error", null));
             }
@@ -36,10 +36,10 @@ public class UserInfoController {
 
     //구글 로그인
     @PostMapping("/google/login")
-    public ResponseEntity<ApiResponse<UserFullData>> GoogleLogin(
+    public ResponseEntity<ApiResponse<UserFullDataDto>> GoogleLogin(
             @RequestBody GoogleLoginDto googleLoginDto) {
         try {
-            UserFullData data = userInfoService.GoogleLogin(googleLoginDto);
+            UserFullDataDto data = userInfoService.GoogleLogin(googleLoginDto);
             if(data == null) {
                 return ResponseEntity.status(500).body(new ApiResponse<>(500, "SignIn guest error", null));
             }
@@ -50,11 +50,25 @@ public class UserInfoController {
     }
 
     //탈퇴
-    @GetMapping("/signOut")
-    public ResponseEntity<ApiResponse<String>> signOut(
-            @RequestParam(value = "uuid", required = true) String uuid ) {
+    @GetMapping("/deleteAccount")
+    public ResponseEntity<ApiResponse<String>> deleteAccount( @RequestParam(value = "uuid", required = true) String uuid ) {
         try {
-            String check = userInfoService.signOut(uuid);
+            String check = userInfoService.deleteAccount(uuid);
+            if(check.endsWith("Success")) {
+                return ResponseEntity.ok(new ApiResponse<>(200, "Delete Account complete successfully", check));
+            }else{
+                return ResponseEntity.status(500).body(new ApiResponse<>(500, "Delete Account error", check));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+        }
+    }
+
+    //로그아웃
+    @PostMapping("/signOut")
+    public ResponseEntity<ApiResponse<String>> signOut( @RequestBody UserFullDataDto userFullDataDto ) {
+        try {
+            String check = userInfoService.signOut(userFullDataDto);
             if(check.endsWith("Success")) {
                 return ResponseEntity.ok(new ApiResponse<>(200, "Sign Out complete successfully", check));
             }else{

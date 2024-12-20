@@ -1,10 +1,11 @@
 package com.teamalphano.zombieboom.service.shop;
 
+import com.teamalphano.zombieboom.common.CharStringEdit;
+import com.teamalphano.zombieboom.dto.shop.ProductDto;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
-import com.teamalphano.zombieboom.model.shop.Product;
+import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
 import com.teamalphano.zombieboom.model.shop.ProductItem;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,43 +14,61 @@ import java.util.List;
 @Service
 public class ShopService {
     private final ShopMapper shopMapper;
+    private final UserDataMapper userDataMapper;
 
-    public ShopService(ShopMapper shopMapper) {
+    public ShopService(ShopMapper shopMapper, UserDataMapper userDataMapper) {
         this.shopMapper = shopMapper;
+        this.userDataMapper = userDataMapper;
     }
 
     // 상품 리스트 조회
-    @SneakyThrows
-    public List<Product> getAllProducts(Integer prodType, String langType) {
-        Product productParam = new Product();
-        productParam.setProdType(prodType);
-        if(langType.isEmpty()){
-            productParam.setLangType("ko");
-        }else{
-            productParam.setLangType(langType);
-        }
-        List<Product> products = shopMapper.getProducts(productParam);
+    public List<ProductDto> getAllProductsAll(Integer userNo, String langType) {
+        //상품 데이터 조회
+        List<ProductDto> products = shopMapper.getProductsAll(langType);
 
         if (products != null) {
-            for (Product product : products) {
+            for (ProductDto product : products) {
                 // 상세 아이템 리스트 조회
                 List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
                 product.setItems(items);}
         }else{
             System.out.println("products 리스트가 null입니다.");
+            return null;
         }
 
+        //유저 데이터 조회
+        UserDataDto userDataDto = userDataMapper.getUserData(userNo);
+
+        if(userDataDto == null) {
+            System.out.println("유저 정보가 없습니다.");
+            return null;
+        }
+        //일회성 상품
+        String uniqProd = userDataDto.getUniqProdList();
+        if(!uniqProd.isEmpty()) {
+            // 문자열에서 대괄호 제거 및 파싱
+            CharStringEdit charStringEdit = new CharStringEdit();
+            List<Integer> userProdNo = charStringEdit.getIntList(uniqProd);
+
+            // 상품 목록과 비교하여 매칭되는 상품 변경
+            for (ProductDto product : products) {
+                if (userProdNo.contains(product.getProdNo())) {
+                    product.setPurchased(true);
+                }
+            }
+        }
         return products;
     }
 
+
     //특정 상품 한개 조회 - engine prodNo으로
     @Transactional
-    public Product getProductDetailByNo(Integer prodNo, String langType){
-        Product productParam = new Product();
+    public ProductDto getProductDetailByNo(Integer prodNo, String langType){
+        ProductDto productParam = new ProductDto();
         productParam.setProdNo(prodNo);
         productParam.setLangType(langType);
 
-        Product product = shopMapper.getProductDetailByNo(productParam);
+        ProductDto product = shopMapper.getProductDetailByNo(productParam);
         if (product != null) {
             List<ProductItem> items = shopMapper.getProductItemByNo(prodNo);
             product.setItems(items);
@@ -61,12 +80,12 @@ public class ShopService {
 
     //특정 상품 한개 조회 - engine prodId으로
     @Transactional
-    public Product getProductDetailById(String prodId, String langType){
-        Product productParam = new Product();
+    public ProductDto getProductDetailById(String prodId, String langType){
+        ProductDto productParam = new ProductDto();
         productParam.setProdId(prodId);
         productParam.setLangType(langType);
 
-        Product product = shopMapper.getProductDetailById(productParam);
+        ProductDto product = shopMapper.getProductDetailById(productParam);
         if (product != null) {
             List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
             product.setItems(items);
@@ -75,21 +94,4 @@ public class ShopService {
         }
         return product;
     }
-
-
-    // 상품 리스트 조회
-    public List<Product> getAllProductsAll() {
-        List<Product> products = shopMapper.getProductsAll();
-
-        if (products != null) {
-            for (Product product : products) {
-                // 상세 아이템 리스트 조회
-                List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
-                product.setItems(items);}
-        }else{
-            System.out.println("products 리스트가 null입니다.");
-        }
-        return products;
-    }
-
 }

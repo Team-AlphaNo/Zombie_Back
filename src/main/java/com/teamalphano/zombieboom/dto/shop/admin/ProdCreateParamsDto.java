@@ -1,11 +1,11 @@
-package com.teamalphano.zombieboom.model.shop;
+package com.teamalphano.zombieboom.dto.shop.admin;
+
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class Product {
+public class ProdCreateParamsDto {
     private int prodNo;
+    private String prodId;
     private int prodPrice;
     private int prodPriceType;
     private int prodType;
@@ -17,14 +17,7 @@ public class Product {
     private int prodOrdr;
     private boolean prodActive;
     private String prodImgKey;
-    private String prodId;
 
-    private List<ProductItem> items;    //상세 아이템 list
-
-    //언어설정
-    private String langType;
     private String prodName;
     private String prodDesc;
-
-    private Integer unityProdType;
 }

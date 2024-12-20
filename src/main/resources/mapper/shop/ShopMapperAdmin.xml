@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper">
-    <select id="getProductListAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopListDto" resultType="com.teamalphano.zombieboom.model.shop.Product">
+    <select id="getProductListAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.admin.ProdListParamsDto" resultType="com.teamalphano.zombieboom.dto.shop.ProductDto">
       SELECT
             prod.prod_no,
             prod.prod_id,
@@ -84,14 +84,14 @@
             lang.prod_No = #{prodNo}
     </select>
 
-    <insert id="createProductAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopCreateDto" useGeneratedKeys="true" keyProperty="prodNo">
+    <insert id="createProductAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.admin.ProdCreateParamsDto" useGeneratedKeys="true" keyProperty="prodNo">
         INSERT INTO tb_product
             (prod_id, prod_price, prod_price_type, prod_type, prod_limit, prod_start_date, prod_end_date, prod_purchase_limit, prod_purchase_count, prod_ordr, prod_active, unity_prod_type, prod_img_key)
         VALUES
             (#{prodId}, #{prodPrice}, #{prodPriceType}, #{prodType}, #{prodLimit}, #{prodStartDatae}, #{prodEndDate}, #{prodPurchaseLimit}, #{prodPurchaseCount}, #{prodOrdr}, #{prodActive}, #{unityProdType}, #{prodImgKey})
     </insert>
 
-    <update id="updateProductDetailAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.ShopUpdateDto">
+    <update id="updateProductDetailAdmin" parameterType="com.teamalphano.zombieboom.dto.shop.admin.ProdUpdateDto">
         UPDATE
             tb_product
         SET
@@ -119,7 +119,7 @@
             prod_no = #{prodNo}
     </delete>
 
-    <update id="updateProductLang" parameterType="com.teamalphano.zombieboom.dto.shop.ShopLangDto">
+    <update id="updateProductLang" parameterType="com.teamalphano.zombieboom.dto.shop.admin.ProdLangUpdateParamsDto">
         UPDATE
             tb_product_lang lang
         SET

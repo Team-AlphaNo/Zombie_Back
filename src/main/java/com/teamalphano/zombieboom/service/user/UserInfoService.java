@@ -1,13 +1,10 @@
 package com.teamalphano.zombieboom.service.user;
 
 import com.teamalphano.zombieboom.common.CharStringEdit;
-import com.teamalphano.zombieboom.dto.user.GoogleLoginDto;
+import com.teamalphano.zombieboom.dto.user.*;
 import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.user.UserInfoMapper;
 import com.teamalphano.zombieboom.model.item.ItemData;
-import com.teamalphano.zombieboom.model.user.UserData;
-import com.teamalphano.zombieboom.model.user.UserFullData;
-import com.teamalphano.zombieboom.model.user.UserInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,31 +15,34 @@ import java.util.List;
 public class UserInfoService {
     private final UserInfoMapper userInfoMapper;
     private final ItemMapper itemMapper;
+    private final UserDataService userDataService;
 
-    public UserInfoService(UserInfoMapper userInfoMapper, ItemMapper itemMapper) {
+    public UserInfoService(UserInfoMapper userInfoMapper,
+                           ItemMapper itemMapper, UserDataService userDataService) {
         this.userInfoMapper = userInfoMapper;
         this.itemMapper = itemMapper;
+        this.userDataService = userDataService;
     }
 
     //게스트 회원가입
 
     @Transactional
-    public UserFullData GuestLogin(String uuid) {
+    public UserFullDataDto GuestLogin(String uuid) {
         //uuid 있는지 체크
-        UserInfo userInfo = userInfoMapper.getUserInfoByUUID(uuid);
-        if(userInfo == null || userInfo.getUserUuid() == null) {
+        UserInfoDto userInfoDto = userInfoMapper.getUserInfoByUUID(uuid);
+        if(userInfoDto == null || userInfoDto.getUserUuid() == null) {
             //회원가입
-            System.out.println("----------------------회원가입");
-            UserInfo newUserInfo = new UserInfo();
-            newUserInfo.setUserUuid(uuid);
+            System.out.println("##################회원가입");
+            UserInfoDto newUserInfoDto = new UserInfoDto();
+            newUserInfoDto.setUserUuid(uuid);
 
-            int rowsAffected = userInfoMapper.insertGuestSignUp(newUserInfo);
+            int rowsAffected = userInfoMapper.insertGuestSignUp(newUserInfoDto);
             System.out.println("Rows affected by insert: " + rowsAffected);
             if (rowsAffected > 0) {
-                int userNo = newUserInfo.getUserNo();
+                int userNo = newUserInfoDto.getUserNo();
                 int userData = userInfoMapper.insertDefaultUserData(userNo);
                 if(userData > 0) {
-                    UserFullData fullData = getUserFullData(userNo);
+                    UserFullDataDto fullData = getUserFullData(userNo);
                     return fullData;
                 }
             }else {
@@ -53,7 +53,7 @@ public class UserInfoService {
             System.out.println("로그인처리");
             int updateLogin = userInfoMapper.updateGuestSignIn(uuid);
             if(updateLogin > 0) {
-                return getUserFullData(userInfo.getUserNo());
+                return getUserFullData(userInfoDto.getUserNo());
             }
         }
         return null;
@@ -62,66 +62,66 @@ public class UserInfoService {
     //구글 로그인
 
     @Transactional
-    public UserFullData GoogleLogin(GoogleLoginDto googleLoginDto){
-        UserInfo userInfo = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
-        if(userInfo.getUserUuid() == null) {
-            UserInfo _userInfo = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
-            if(_userInfo != null) {
+    public UserFullDataDto GoogleLogin(GoogleLoginDto googleLoginDto){
+        UserInfoDto userInfoDto = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
+        if(userInfoDto.getUserUuid() == null) {
+            UserInfoDto _userInfoDto = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
+            if(_userInfoDto != null) {
                 System.out.println("#########uuid는 없는데 해당 구글 아이디 있음");
                 System.out.println("#########해당 구글아이디의 uuid를 업데이트");
                 //uuid는 없는데 해당 구글 아이디 있음
                 //해당 구글아이디의 uuid를 업데이트
-                _userInfo.setUserUuid(googleLoginDto.getUserUuid());
-                userInfoMapper.updateUserInfoGoogleUUID(_userInfo);
-                return getUserFullData(_userInfo.getUserNo());
+                _userInfoDto.setUserUuid(googleLoginDto.getUserUuid());
+                userInfoMapper.updateUserInfoGoogleUUID(_userInfoDto);
+                return getUserFullData(_userInfoDto.getUserNo());
             }else{
                 //회원가입
                 System.out.println("#########회원가입");
 
-                UserInfo newUserInfo = new UserInfo();
-                newUserInfo.setUserUuid(googleLoginDto.getUserUuid());
-                newUserInfo.setUserId(googleLoginDto.getUserId());
-                newUserInfo.setUserName(googleLoginDto.getUserName());
-                newUserInfo.setUserEmail(googleLoginDto.getUserEmail());
-                int insert = userInfoMapper.insertGoogleSignUp(newUserInfo);
+                UserInfoDto newUserInfoDto = new UserInfoDto();
+                newUserInfoDto.setUserUuid(googleLoginDto.getUserUuid());
+                newUserInfoDto.setUserId(googleLoginDto.getUserId());
+                newUserInfoDto.setUserName(googleLoginDto.getUserName());
+                newUserInfoDto.setUserEmail(googleLoginDto.getUserEmail());
+                int insert = userInfoMapper.insertGoogleSignUp(newUserInfoDto);
                 if(insert > 0) {
-                    int insertData = userInfoMapper.insertDefaultUserData(newUserInfo.getUserNo());
+                    int insertData = userInfoMapper.insertDefaultUserData(newUserInfoDto.getUserNo());
                     if (insertData > 0) {
-                        int userNo = newUserInfo.getUserNo();
+                        int userNo = newUserInfoDto.getUserNo();
                         return getUserFullData(userNo);
                     }
                 }
             }
         }else{
             //게스트 id 있음
-            if(userInfo.getUserId() != null){
+            if(userInfoDto.getUserId() != null){
                 //구글 로그인
                 System.out.println("#########게스트 아이디에 구글 로그인");
                 int updateLogin = userInfoMapper.updateGoogleSignIn(googleLoginDto.getUserId());
-                return getUserFullData(userInfo.getUserNo());
+                return getUserFullData(userInfoDto.getUserNo());
             }else{
                 //구글 아이디 찾기
-                UserInfo _userInfo = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
-                if(_userInfo != null) {
+                UserInfoDto _userInfoDto = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
+                if(_userInfoDto != null) {
                     //구글 아이디가 있고, 게스트 아이디도 있음
                     //아이디는 delete처리, 구글아이디에 uuid 업데이트
                     System.out.println("#########구글 아이디가 있고, 게스트 아이디도 있음");
                     System.out.println("#########아이디는 delete처리, 구글아이디에 uuid 업데이트");
-                    userInfoMapper.inactiveUserInfoByUserNo(_userInfo.getUserNo());
-                    _userInfo.setUserUuid(googleLoginDto.getUserId());
-                    userInfoMapper.updateUuidForGuestToGoogle(_userInfo);
-                    return getUserFullData(_userInfo.getUserNo());
+                    userInfoMapper.inactiveUserInfoByUserNo(_userInfoDto.getUserNo());
+                    _userInfoDto.setUserUuid(googleLoginDto.getUserId());
+                    userInfoMapper.updateUuidForGuestToGoogle(_userInfoDto);
+                    return getUserFullData(_userInfoDto.getUserNo());
                 }else{
                     //게스트 아이디는 있으나 구글 아이디는 없음
                     //게스트 아이디에 구글아이디 업데이트
                     System.out.println("#########게스트 아이디는 있으나 구글 아이디는 없음");
                     System.out.println("#########게스트 아이디에 구글아이디 업데이트");
-                    userInfo.setUserId(googleLoginDto.getUserId());
-                    userInfo.setUserEmail(googleLoginDto.getUserEmail());
-                    userInfo.setUserName(googleLoginDto.getUserName());
-                    int update = userInfoMapper.updateGuestInfoToGPGS(userInfo);
+                    userInfoDto.setUserId(googleLoginDto.getUserId());
+                    userInfoDto.setUserEmail(googleLoginDto.getUserEmail());
+                    userInfoDto.setUserName(googleLoginDto.getUserName());
+                    int update = userInfoMapper.updateGuestInfoToGPGS(userInfoDto);
                     if(update > 0) {
-                        return getUserFullData(userInfo.getUserNo());
+                        return getUserFullData(userInfoDto.getUserNo());
                     }else{
                         System.out.println("no update");
                     }
@@ -131,7 +131,9 @@ public class UserInfoService {
         return null;
     }
 
-    public String signOut(String uuid) {
+
+
+    public String deleteAccount(String uuid) {
         int del = userInfoMapper.inactiveUserInfoByUuid(uuid);
         if(del > 0) {
             return "Success";
@@ -140,19 +142,31 @@ public class UserInfoService {
         }
     }
 
-    private UserFullData getUserFullData(Integer userNo) {
-        // UserFullData 초기화
-        UserFullData userFullData = new UserFullData();
-        UserInfo userInfo = userInfoMapper.getUserInfoByUserNo(userNo);
-        UserData userData = userInfoMapper.getUserDataByUserNo(userNo);
+    public String signOut(UserFullDataDto userFullDataDto){
+        //데이터 업데이트
+        userDataService.userDataUpdateByFullData(userFullDataDto);
+        int signOutBool = userInfoMapper.signOut(userFullDataDto.getUserInfo().getUserNo());
+        if(signOutBool > 0) {
+            return "Success";
+        }else{
+            return "Fail";
+        }
+    }
 
-        userFullData.setUserInfo(userInfo);
-        userFullData.setUserData(userData);
+    //전체 유저 데이터 조회
+    public UserFullDataDto getUserFullData(Integer userNo) {
+        // UserFullData 초기화
+        UserFullDataDto userFullDataDto = new UserFullDataDto();
+        UserInfoDto userInfoDto = userInfoMapper.getUserInfoByUserNo(userNo);
+        UserDataDto userDataDto = userInfoMapper.getUserDataByUserNo(userNo);
+
+        userFullDataDto.setUserInfo(userInfoDto);
+        userFullDataDto.setUserData(userDataDto);
 
         // UserData에서 charList 가져오기
-        String charList = userData.getUserCharList();
+        String charList = userDataDto.getUserCharList();
         if (charList == null || charList.isEmpty()) {
-            return userFullData;
+            return userFullDataDto;
         }
 
         try {
@@ -172,7 +186,7 @@ public class UserInfoService {
                 }
             }
 
-            userData.setUserCharDataList(charDataList);
+            userDataDto.setUserCharDataList(charDataList);
 
         } catch (NumberFormatException e) {
             System.err.println("Failed to parse UserCharList: " + charList);
@@ -181,6 +195,6 @@ public class UserInfoService {
             System.err.println("Unexpected error occurred while processing UserCharList for userNo: " + userNo);
             e.printStackTrace();
         }
-        return userFullData;
+        return userFullDataDto;
     }
 }

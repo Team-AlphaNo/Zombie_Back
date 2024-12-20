@@ -1,10 +1,10 @@
 package com.teamalphano.zombieboom.controller.shop;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
-import com.teamalphano.zombieboom.dto.shop.ShopCreateDto;
-import com.teamalphano.zombieboom.dto.shop.ShopListDto;
-import com.teamalphano.zombieboom.dto.shop.ShopUpdateDto;
-import com.teamalphano.zombieboom.model.shop.Product;
+import com.teamalphano.zombieboom.dto.shop.ProductDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdCreateParamsDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdListParamsDto;
+import com.teamalphano.zombieboom.dto.shop.admin.ProdUpdateDto;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
 import com.teamalphano.zombieboom.service.shop.ShopAdminService;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +29,11 @@ public class ShopAdminController {
 
     //상품 목록 - admin
     @PostMapping("/products")
-    public ResponseEntity<ApiResponse<List<Product>>> getProductListAdmin(
-            @RequestBody ShopListDto shopListDto) {
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getProductListAdmin(
+            @RequestBody ProdListParamsDto shopListDto) {
         try {
             System.out.println("ShopListDto: " + shopListDto.toString());
-            List<Product> prod = shopAdminService.getProductListAdmin(shopListDto);
+            List<ProductDto> prod = shopAdminService.getProductListAdmin(shopListDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", prod));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
@@ -56,16 +56,16 @@ public class ShopAdminController {
     @PostMapping("/product/create")
     public ResponseEntity<ApiResponse<String>> createProductDetailAdmin(
             @RequestPart(value = "prodImage", required = true) MultipartFile prodImage,
-            @RequestPart("productData") ShopCreateDto shopCreateDto) {
+            @RequestPart("productData") ProdCreateParamsDto prodCreateParamsDto) {
         try {
             String fileName = UUID.randomUUID() + "_" + prodImage.getOriginalFilename();
             Path filePath = Paths.get(UPLOAD_DIR + fileName);
             prodImage.transferTo(filePath.toFile());
 
             String fileUrl = "teamalphano.site:80/uploads/" + fileName;
-            shopCreateDto.setProdImgKey(fileUrl);
+            prodCreateParamsDto.setProdImgKey(fileUrl);
 
-            String message = shopAdminService.createProductAdmin(shopCreateDto);
+            String message = shopAdminService.createProductAdmin(prodCreateParamsDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", message));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
@@ -76,7 +76,7 @@ public class ShopAdminController {
     @PostMapping("/product/update")
     public ResponseEntity<ApiResponse<String>> updateProductDetailAdmin(
             @RequestPart(value = "prodImage", required = false) MultipartFile prodImage,
-            @RequestPart("productData") ShopUpdateDto shopUpdateDto
+            @RequestPart("productData") ProdUpdateDto prodUpdateDto
     ) {
         try {
             String fileName = UUID.randomUUID() + "_" + prodImage.getOriginalFilename();
@@ -84,9 +84,9 @@ public class ShopAdminController {
             prodImage.transferTo(filePath.toFile());
 
             String fileUrl = "teamalphano.site:80/uploads/" + fileName;
-            shopUpdateDto.setProdImgKey(fileUrl);
+            prodUpdateDto.setProdImgKey(fileUrl);
 
-            String response = shopAdminService.updateProductDetailAdmin(shopUpdateDto);
+            String response = shopAdminService.updateProductDetailAdmin(prodUpdateDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", response));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));

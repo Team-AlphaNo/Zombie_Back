@@ -2,7 +2,7 @@ package com.teamalphano.zombieboom.controller.rank;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.rank.RankInsertDto;
-import com.teamalphano.zombieboom.model.rank.WorldRank;
+import com.teamalphano.zombieboom.dto.rank.RankDto;
 import com.teamalphano.zombieboom.service.rank.RankService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,11 +20,11 @@ public class RankController {
     }
 
     @GetMapping("/world")
-    public ResponseEntity<ApiResponse<List<WorldRank>>> getWorldRankList(
+    public ResponseEntity<ApiResponse<List<RankDto>>> getWorldRankList(
             @RequestParam(value = "type", required = false) Integer type
     ){
         try{
-            List<WorldRank> data= rankService.getWorldRankList(type);
+            List<RankDto> data= rankService.getWorldRankList(type);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", data));
         }catch (Exception e){
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
@@ -39,6 +39,19 @@ public class RankController {
             System.out.println(rankInsertDto.toString());
             String insert = rankService.insertRank(rankInsertDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success", insert));
+        }catch (Exception e){
+            return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
+        }
+    }
+
+    @GetMapping("/myrank")
+    public ResponseEntity<ApiResponse<RankDto>> myRank(
+            @RequestParam(value = "type", required = true) Integer type,
+            @RequestParam(value = "userNo", required = true) Integer userNo
+    ){
+        try {
+             RankDto rank = rankService.getMyRank(type, userNo);
+            return ResponseEntity.ok(new ApiResponse<>(200, "MyRank", rank));
         }catch (Exception e){
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }

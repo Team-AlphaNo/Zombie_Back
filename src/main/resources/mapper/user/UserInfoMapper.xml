@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.teamalphano.zombieboom.mapper.user.UserInfoMapper">
-    <select id="getUserInfoByUUID" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <select id="getUserInfoByUUID" parameterType="String" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         SELECT
             user.user_no,
             user.user_id,
@@ -26,7 +26,7 @@
             AND user.del_yn = false
     </select>
 
-    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         SELECT
             user.user_no,
             user.user_id,
@@ -49,7 +49,7 @@
             AND user.user_no = #{userNo}
     </select>
 
-    <select id="getUserInfoByUserId" parameterType="String" resultType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <select id="getUserInfoByUserId" parameterType="String" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         SELECT
             user.user_no,
             user.user_id,
@@ -72,13 +72,14 @@
             AND user.user_id = #{userId}
     </select>
 
-    <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.user.UserData">
+    <select id="getUserDataByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.user.UserDataDto">
         SELECT
             data.user_ticket,
             data.user_money,
             data.user_char_list,
             data.user_select_char,
-            data.user_ticket_timer
+            data.time_ticket_end_date,
+            data.uniq_prod_list
         FROM
             tb_user_info user
             LEFT JOIN boom.tb_user_data data
@@ -90,7 +91,7 @@
             AND data.user_no = #{userNo}
     </select>
 
-    <insert id="insertGuestSignUp" parameterType="com.teamalphano.zombieboom.model.user.UserInfo" useGeneratedKeys="true" keyProperty="userNo">
+    <insert id="insertGuestSignUp" parameterType="com.teamalphano.zombieboom.dto.user.UserInfoDto" useGeneratedKeys="true" keyProperty="userNo">
         INSERT INTO tb_user_info
             (user_id, user_pwd, user_name, platform, user_email, create_user, create_date, del_yn, user_uuid)
         VALUES
@@ -99,9 +100,9 @@
 
     <insert id="insertDefaultUserData" parameterType="Int">
         INSERT INTO tb_user_data
-            (user_no, user_ticket, user_char_list, user_ticket_timer)
+            (user_no, user_ticket)
         VALUES
-            (#{userNo}, 5, null, null)
+            (#{userNo}, 5)
     </insert>
 
     <update id="updateGuestSignIn" parameterType="String">
@@ -115,7 +116,7 @@
             info.user_uuid = #{uuid}
     </update>
 
-    <insert id="insertGoogleSignUp" parameterType="com.teamalphano.zombieboom.model.user.UserInfo" useGeneratedKeys="true" keyProperty="userNo">
+    <insert id="insertGoogleSignUp" parameterType="com.teamalphano.zombieboom.dto.user.UserInfoDto" useGeneratedKeys="true" keyProperty="userNo">
         INSERT INTO tb_user_info
             (user_id, user_pwd, user_name, platform, user_email, create_user, create_date, del_yn, user_uuid)
         VALUES
@@ -134,7 +135,7 @@
             info.user_id = #{userId}
     </update>
 
-    <update id="updateUuidForGuestToGoogle" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <update id="updateUuidForGuestToGoogle" parameterType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         UPDATE
             tb_user_info info
         SET
@@ -168,7 +169,7 @@
             info.user_uuid = #{uuid}
     </update>
 
-    <update id="updateUserInfoGoogleUUID" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <update id="updateUserInfoGoogleUUID" parameterType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         UPDATE
             tb_user_info info
         SET
@@ -179,7 +180,7 @@
             info.user_id = #{userId}
     </update>
 
-    <update id="updateGuestInfoToGPGS" parameterType="com.teamalphano.zombieboom.model.user.UserInfo">
+    <update id="updateGuestInfoToGPGS" parameterType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
         UPDATE
             tb_user_info info
         SET
@@ -188,6 +189,16 @@
             info.user_name = #{userName},
             info.update_date = now(),
             info.update_user = 'LOGIN'
+        WHERE
+            info.user_no = #{userNo}
+    </update>
+
+    <update id="signOut" parameterType="Integer">
+        UPDATE
+            tb_user_info info
+        SET
+            info.update_date = now(),
+            info.last_lgout = now()
         WHERE
             info.user_no = #{userNo}
     </update>

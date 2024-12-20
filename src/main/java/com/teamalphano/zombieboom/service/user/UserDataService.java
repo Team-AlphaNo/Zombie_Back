@@ -3,14 +3,17 @@ package com.teamalphano.zombieboom.service.user;
 import com.teamalphano.zombieboom.common.CharStringEdit;
 import com.teamalphano.zombieboom.dto.purchase.DeductAmountDto;
 import com.teamalphano.zombieboom.dto.purchase.PurchaseGrantDto;
+import com.teamalphano.zombieboom.dto.shop.ProductDto;
+import com.teamalphano.zombieboom.dto.user.UpdateUserDataDto;
 import com.teamalphano.zombieboom.dto.user.UserBuyDto;
+import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
 import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
 import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
 import com.teamalphano.zombieboom.model.item.ItemData;
-import com.teamalphano.zombieboom.model.shop.Product;
 import com.teamalphano.zombieboom.model.shop.ProductItem;
-import com.teamalphano.zombieboom.model.user.UserData;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +38,7 @@ public class UserDataService {
         this.itemMapper = itemMapper;
     }
 
-    //상품 구입 - 금액 차감
+    //상품 구입시 - 금액 차감
     @Transactional
     public boolean deductAmount(DeductAmountDto deductAmountDto){
         int deduct = userDataMapper.deductUserCoin(deductAmountDto);
@@ -43,10 +46,10 @@ public class UserDataService {
     }
 
 
-    //상품 구입 - 코인
+    //상품 구입시 - 상품지급
     @Transactional
-    public UserData userGrantProduct(PurchaseGrantDto purchaseGrantDto) {
-        Product product = checkProduct(purchaseGrantDto.getProdId());
+    public UserDataDto userGrantProduct(PurchaseGrantDto purchaseGrantDto) {
+        ProductDto product = checkProduct(purchaseGrantDto.getProdId());
         if(product != null) {
             UserBuyDto userBuyDto = buyProdCheck(product);
             userBuyDto.setProdNo(product.getProdNo());
@@ -64,12 +67,12 @@ public class UserDataService {
         }
     }
 
-    private Product checkProduct(String prodId){
-        Product productParam = new Product();
+    private ProductDto checkProduct(String prodId){
+        ProductDto productParam = new ProductDto();
         productParam.setProdId(prodId);
 
         //상품 상세 데이터
-        Product product = shopMapper.getProductDetailById(productParam);
+        ProductDto product = shopMapper.getProductDetailById(productParam);
         if (product != null) {
             if(product.isProdLimit() && product.getProdPurchaseCount()<=0){
                 System.out.println("상품 다 팔림");
@@ -85,7 +88,7 @@ public class UserDataService {
         }
     }
 
-    private UserBuyDto buyProdCheck(Product product) {
+    private UserBuyDto buyProdCheck(ProductDto product) {
         UserBuyDto userBuyDto = new UserBuyDto();
 
         List<Integer> charList = new ArrayList<>();
@@ -116,7 +119,7 @@ public class UserDataService {
         }
 
         if(!totalTime.equals(LocalTime.of(0, 0, 0))){
-            userBuyDto.setUserTicketTimer(totalTime.format(formatter));
+            userBuyDto.setTimeTicketRange(totalTime.format(formatter));
         }
 
         String jsonString = "";
@@ -137,16 +140,16 @@ public class UserDataService {
     }
 
     //유저 데이터 조회
-    public UserData getUserData(Integer userNo) {
-        UserData userData = userDataMapper.getUserData(userNo);
-        return addCharDataToUserData(userData);
+    public UserDataDto getUserData(Integer userNo) {
+        UserDataDto userDataDto = userDataMapper.getUserData(userNo);
+        return addCharDataToUserData(userDataDto);
     }
 
     //공통 유저 캐릭터 데이터 list
-    private UserData addCharDataToUserData(UserData userData) {
-        if(!userData.getUserCharList().equals("[]")){
+    private UserDataDto addCharDataToUserData(UserDataDto userDataDto) {
+        if(!userDataDto.getUserCharList().equals("[]")){
             CharStringEdit charStringEdit = new CharStringEdit();
-            List<Integer> charNoList = charStringEdit.getIntList(userData.getUserCharList());
+            List<Integer> charNoList = charStringEdit.getIntList(userDataDto.getUserCharList());
 
             // CharacterData 리스트 생성
             List<ItemData> charDataList = new ArrayList<>();
@@ -159,8 +162,17 @@ public class UserDataService {
                     System.err.println("No CharacterData found for charId: " + charId);
                 }
             }
-            userData.setUserCharDataList(charDataList);
+            userDataDto.setUserCharDataList(charDataList);
         }
-        return userData;
+        return userDataDto;
+    }
+
+    //전체 데이터로 유저 데이터 업데이트
+    public void userDataUpdateByFullData(UserFullDataDto userFullDataDto) {
+        Integer userNo = userFullDataDto.getUserInfo().getUserNo();
+        UpdateUserDataDto updateUserDataDto = new UpdateUserDataDto();
+        BeanUtils.copyProperties(userFullDataDto.getUserData(), updateUserDataDto);
+        updateUserDataDto.setUserMoney(userNo);
+        userDataMapper.updateUserData(updateUserDataDto);
     }
 }

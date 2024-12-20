@@ -1,10 +1,10 @@
 package com.teamalphano.zombieboom.dto.purchase;
 
-import com.teamalphano.zombieboom.model.user.UserData;
+import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import lombok.Data;
 
 @Data
 public class PurchaseResponseDto {
-    private UserData userData;
+    private UserDataDto userDataDto;
     private String purchaseStatus;
 }

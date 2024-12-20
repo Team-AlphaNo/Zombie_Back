@@ -1,7 +1,7 @@
 package com.teamalphano.zombieboom.mapper.rank;
 
 import com.teamalphano.zombieboom.dto.rank.RankInsertDto;
-import com.teamalphano.zombieboom.model.rank.WorldRank;
+import com.teamalphano.zombieboom.dto.rank.RankDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -10,11 +10,15 @@ import java.util.List;
 public interface RankMapper {
 
 
-    List<WorldRank> getWorldTotalRankList();
-
-    List<WorldRank> getWorldMonthRankList();
-
-    List<WorldRank> getWorldDayRankList();
+    //전체 리스트
+    List<RankDto> getWorldTotalRankList();
+    List<RankDto> getWorldMonthRankList();
+    List<RankDto> getWorldDayRankList();
 
     int insertRank(RankInsertDto rankInsertDto);
+
+    RankDto getMyRankTotal(Integer userNo);
+    RankDto getMyRankMonth(Integer userNo);
+    RankDto getMyRankDay(Integer userNo);
+
 }
