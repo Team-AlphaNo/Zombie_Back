@@ -1,6 +1,7 @@
 package com.teamalphano.zombieboom.mapper.user;
 
 import com.teamalphano.zombieboom.dto.purchase.DeductAmountDto;
+import com.teamalphano.zombieboom.dto.user.UpdateTicketDto;
 import com.teamalphano.zombieboom.dto.user.UpdateUserDataDto;
 import com.teamalphano.zombieboom.dto.user.UserBuyDto;
 import com.teamalphano.zombieboom.dto.user.UserDataDto;
@@ -17,4 +18,6 @@ public interface UserDataMapper {
     int deductUserCoin(DeductAmountDto deductAmountDto);
 
     int updateUserData(UpdateUserDataDto updateUserDataDto);
+
+    int updateUserTicket(UpdateTicketDto updateTicketDto);
 }

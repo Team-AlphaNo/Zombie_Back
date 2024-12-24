@@ -108,7 +108,7 @@ public class UserInfoService {
                     System.out.println("#########구글 아이디가 있고, 게스트 아이디도 있음");
                     System.out.println("#########아이디는 delete처리, 구글아이디에 uuid 업데이트");
                     userInfoMapper.inactiveUserInfoByUserNo(_userInfoDto.getUserNo());
-                    _userInfoDto.setUserUuid(googleLoginDto.getUserId());
+                    _userInfoDto = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
                     userInfoMapper.updateUuidForGuestToGoogle(_userInfoDto);
                     return getUserFullData(_userInfoDto.getUserNo());
                 }else{

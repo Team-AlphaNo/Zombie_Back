@@ -70,4 +70,13 @@
         WHERE
             data.user_no = #{userNo}
     </update>
+
+    <update id="updateUserTicket" parameterType="com.teamalphano.zombieboom.dto.user.UpdateTicketDto">
+        UPDATE
+            tb_user_data data
+        SET
+            data.user_ticket = #{ticketCount}
+        WHERE
+            data.user_no = #{userNo}
+    </update>
 </mapper>

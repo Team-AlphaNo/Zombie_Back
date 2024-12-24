@@ -4,15 +4,12 @@ import com.teamalphano.zombieboom.common.CharStringEdit;
 import com.teamalphano.zombieboom.dto.purchase.DeductAmountDto;
 import com.teamalphano.zombieboom.dto.purchase.PurchaseGrantDto;
 import com.teamalphano.zombieboom.dto.shop.ProductDto;
-import com.teamalphano.zombieboom.dto.user.UpdateUserDataDto;
-import com.teamalphano.zombieboom.dto.user.UserBuyDto;
-import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
+import com.teamalphano.zombieboom.dto.user.*;
 import com.teamalphano.zombieboom.mapper.item.ItemMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopMapper;
 import com.teamalphano.zombieboom.mapper.user.UserDataMapper;
 import com.teamalphano.zombieboom.model.item.ItemData;
 import com.teamalphano.zombieboom.model.shop.ProductItem;
-import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +28,7 @@ public class UserDataService {
     public UserDataService(
             UserDataMapper userDataMapper,
             ShopMapper shopMapper,
-            ItemMapper itemMapper
-    ) {
+            ItemMapper itemMapper) {
         this.userDataMapper = userDataMapper;
         this.shopMapper = shopMapper;
         this.itemMapper = itemMapper;
@@ -174,5 +170,10 @@ public class UserDataService {
         BeanUtils.copyProperties(userFullDataDto.getUserData(), updateUserDataDto);
         updateUserDataDto.setUserMoney(userNo);
         userDataMapper.updateUserData(updateUserDataDto);
+    }
+
+    @Transactional
+    public int updateUserTicket(UpdateTicketDto updateTicketDto){
+        return userDataMapper.updateUserTicket(updateTicketDto);
     }
 }

@@ -9,7 +9,9 @@ import com.teamalphano.zombieboom.model.shop.ProductItem;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ShopService {
@@ -26,14 +28,15 @@ public class ShopService {
         //상품 데이터 조회
         List<ProductDto> products = shopMapper.getProductsAll(langType);
 
-        if (products != null) {
-            for (ProductDto product : products) {
-                // 상세 아이템 리스트 조회
-                List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
-                product.setItems(items);}
-        }else{
-            System.out.println("products 리스트가 null입니다.");
+        if (products == null || products.isEmpty()) {
+            System.out.println("products 리스트가 비어있거나 null입니다.");
             return null;
+        }
+
+        for (ProductDto product : products) {
+            // 상세 아이템 리스트 조회
+            List<ProductItem> items = shopMapper.getProductItemByNo(product.getProdNo());
+            product.setItems(items);
         }
 
         //유저 데이터 조회
@@ -43,16 +46,20 @@ public class ShopService {
             System.out.println("유저 정보가 없습니다.");
             return null;
         }
+
         //일회성 상품
         String uniqProd = userDataDto.getUniqProdList();
-        if(!uniqProd.isEmpty()) {
+        if(uniqProd != null && !uniqProd.isEmpty()) {
+            System.out.println("uniq is exist");
+
             // 문자열에서 대괄호 제거 및 파싱
             CharStringEdit charStringEdit = new CharStringEdit();
             List<Integer> userProdNo = charStringEdit.getIntList(uniqProd);
+            Set<Integer> userProdNoSet = new HashSet<>(userProdNo);
 
             // 상품 목록과 비교하여 매칭되는 상품 변경
             for (ProductDto product : products) {
-                if (userProdNo.contains(product.getProdNo())) {
+                if (userProdNoSet.contains(product.getProdNo())) {
                     product.setPurchased(true);
                 }
             }
