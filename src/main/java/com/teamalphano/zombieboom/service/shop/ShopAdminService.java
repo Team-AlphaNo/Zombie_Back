@@ -8,6 +8,7 @@ import com.teamalphano.zombieboom.dto.shop.admin.ProdUpdateDto;
 import com.teamalphano.zombieboom.mapper.item.ItemRelationMapper;
 import com.teamalphano.zombieboom.mapper.shop.ShopAdminMapper;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
+import com.teamalphano.zombieboom.model.shop.ProductItem;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +36,9 @@ public class ShopAdminService {
 
         ProductAdmin product = shopAdminMapper.getProductDetailAdmin(prodNo);
         List<ProductLang> prodLangs = shopAdminMapper.getProductLangs(prodNo);
-
         product.setProductLangData(prodLangs);
+        List<ProductItem> itemList = shopAdminMapper.getProductItems(prodNo);
+        product.setItems(itemList);
 
         return product;
     }

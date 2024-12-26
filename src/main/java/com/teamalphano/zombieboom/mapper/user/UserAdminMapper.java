@@ -1,8 +1,8 @@
 package com.teamalphano.zombieboom.mapper.user;
 
-import com.teamalphano.zombieboom.dto.user.admin.UserListParamsDto;
 import com.teamalphano.zombieboom.dto.user.UserDataDto;
-import com.teamalphano.zombieboom.dto.user.UserInfoDto;
+import com.teamalphano.zombieboom.dto.user.admin.UserInfoAdminDto;
+import com.teamalphano.zombieboom.dto.user.admin.UserListParamsDto;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
@@ -10,11 +10,11 @@ import java.util.List;
 public interface UserAdminMapper {
 
     //유저 목록
-    List<UserInfoDto> getUserListAll(UserListParamsDto userListParamsDto);
+    List<UserInfoAdminDto> getUserListAll(UserListParamsDto userListParamsDto);
 
     //유저 상세 데이터 조회
-    UserInfoDto getUserById(String id);
+    UserInfoAdminDto getUserById(String id);
 
-    UserInfoDto getUserInfoByUserNo(Integer userNo);
+    UserInfoAdminDto getUserInfoByUserNo(Integer userNo);
     UserDataDto getUserDataByUserNo(Integer userNo);
 }

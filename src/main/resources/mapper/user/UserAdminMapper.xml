@@ -4,7 +4,7 @@
 
 <mapper namespace="com.teamalphano.zombieboom.mapper.user.UserAdminMapper">
 
-    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto"
+    <select id="getUserListAll" resultType="com.teamalphano.zombieboom.dto.user.admin.UserInfoAdminDto"
             parameterType="com.teamalphano.zombieboom.dto.user.admin.UserListParamsDto">
         SELECT
             *
@@ -21,7 +21,7 @@
             </if>
     </select>
 
-    <select id="getUserById" parameterType="String" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
+    <select id="getUserById" parameterType="String" resultType="com.teamalphano.zombieboom.dto.user.admin.UserInfoAdminDto">
         SELECT
             *
         FROM
@@ -32,7 +32,7 @@
         AND user.platform = 'ADMIN'
     </select>
 
-    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.user.UserInfoDto">
+    <select id="getUserInfoByUserNo" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.user.admin.UserInfoAdminDto">
         SELECT
             *
         FROM

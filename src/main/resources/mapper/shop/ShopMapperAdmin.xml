@@ -138,4 +138,21 @@
         WHERE
             prod.prod_no = #{prodNo}
     </update>
+
+    <select id="getProductItems" parameterType="Integer" resultType="com.teamalphano.zombieboom.model.shop.ProductItem">
+        SELECT
+            rel.prod_item_no,
+            item.item_no,
+            item.item_name,
+            item.item_count,
+            item.item_time,
+            item.item_type
+        FROM
+            tb_product_item rel
+        JOIN
+            tb_item item
+            ON rel.item_no = item.item_no
+        WHERE
+            rel.prod_no = #{prod_no}
+    </select>
 </mapper>

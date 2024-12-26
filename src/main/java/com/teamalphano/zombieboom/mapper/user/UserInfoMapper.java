@@ -1,5 +1,6 @@
 package com.teamalphano.zombieboom.mapper.user;
 
+import com.teamalphano.zombieboom.dto.user.LogOutDto;
 import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import com.teamalphano.zombieboom.dto.user.UserInfoDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -48,5 +49,5 @@ public interface UserInfoMapper {
     @Select("SELECT LAST_INSERT_ID()")
     int getLastInsertedUserNo();
 
-    int signOut(Integer userNo);
+    int signOut(LogOutDto logOutDto);
 }

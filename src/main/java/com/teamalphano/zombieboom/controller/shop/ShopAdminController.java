@@ -55,9 +55,12 @@ public class ShopAdminController {
     //상품 등록 - admin
     @PostMapping("/product/create")
     public ResponseEntity<ApiResponse<String>> createProductDetailAdmin(
-            @RequestPart(value = "prodImage", required = true) MultipartFile prodImage,
-            @RequestPart("productData") ProdCreateParamsDto prodCreateParamsDto) {
+            @RequestPart("prodImage") MultipartFile prodImage,
+            @RequestPart("productData") @ModelAttribute ProdCreateParamsDto prodCreateParamsDto) {
         try {
+            System.out.println("Received File: " + prodImage.getOriginalFilename());
+            System.out.println("Content Type: " + prodImage.getContentType());
+
             String fileName = UUID.randomUUID() + "_" + prodImage.getOriginalFilename();
             Path filePath = Paths.get(UPLOAD_DIR + fileName);
             prodImage.transferTo(filePath.toFile());

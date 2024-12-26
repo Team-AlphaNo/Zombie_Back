@@ -2,6 +2,8 @@ package com.teamalphano.zombieboom.controller.user;
 
 import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.user.admin.LoginParamsDto;
+import com.teamalphano.zombieboom.dto.user.admin.UserFullDataAdminDto;
+import com.teamalphano.zombieboom.dto.user.admin.UserInfoAdminDto;
 import com.teamalphano.zombieboom.dto.user.admin.UserListParamsDto;
 import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
 import com.teamalphano.zombieboom.dto.user.UserInfoDto;
@@ -22,11 +24,11 @@ public class UserAdminController {
 
     //유저 목록
     @PostMapping("/list")
-    public ResponseEntity<ApiResponse<List<UserInfoDto>>> getAllUsers(
+    public ResponseEntity<ApiResponse<List<UserInfoAdminDto>>> getAllUsers(
             @RequestBody UserListParamsDto userListParamsDto
     ) {
         try {
-            List<UserInfoDto> userList = userAdminService.getUserListAll(userListParamsDto);
+            List<UserInfoAdminDto> userList = userAdminService.getUserListAll(userListParamsDto);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success",userList));
         }catch (Exception e) {
             return ResponseEntity.status(500).body( null);
@@ -35,10 +37,10 @@ public class UserAdminController {
 
     //관리자 - 로그인 처리
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserInfoDto>> AdminLogin(
+    public ResponseEntity<ApiResponse<UserInfoAdminDto>> AdminLogin(
             @RequestBody LoginParamsDto loginParamsDto) {
         try {
-            UserInfoDto user = userAdminService.AdminLogin(loginParamsDto);
+            UserInfoAdminDto user = userAdminService.AdminLogin(loginParamsDto);
             if (user != null) {
                 return ResponseEntity.ok(new ApiResponse<>(200, "Success", user));
             } else {
@@ -51,11 +53,11 @@ public class UserAdminController {
 
     //상세정보
     @GetMapping("/detail")
-    public ResponseEntity<ApiResponse<UserFullDataDto>> getUserDataDetail(
+    public ResponseEntity<ApiResponse<UserFullDataAdminDto>> getUserDataDetail(
             @RequestParam(value = "userNo", required = true) int userNo
     ) {
         try {
-            UserFullDataDto data = userAdminService.getUserDataDetail(userNo);
+            UserFullDataAdminDto data = userAdminService.getUserDataDetail(userNo);
             return ResponseEntity.ok(new ApiResponse<>(200, "Success",data));
         }catch (Exception e) {
             return ResponseEntity.status(500).body( null);

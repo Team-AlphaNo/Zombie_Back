@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UserFullDataDto {
-    UserInfoDto userInfo;
-    UserDataDto userData;
+    private UserInfoDto userInfo;
+    private UserDataDto userData;
 }

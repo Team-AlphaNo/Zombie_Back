@@ -7,16 +7,13 @@
         SELECT
             user.user_no,
             user.user_id,
-            user.user_pwd,
             user.user_name,
             user.platform,
             user.user_email,
-            user.create_date,
-            user.create_user,
-            user.update_user,
-            user.update_date,
-            user.del_yn,
-            user.user_uuid
+            user.user_uuid,
+            user.last_lgout,
+            user.last_lgin,
+            user.last_ticket_charge_time
         FROM
             tb_user_info user
         WHERE
@@ -30,16 +27,13 @@
         SELECT
             user.user_no,
             user.user_id,
-            user.user_pwd,
             user.user_name,
             user.platform,
             user.user_email,
-            user.create_date,
-            user.create_user,
-            user.update_user,
-            user.update_date,
-            user.del_yn,
-            user.user_uuid
+            user.user_uuid,
+            user.last_lgout,
+            user.last_lgin,
+            user.last_ticket_charge_time
         FROM
             tb_user_info user
         WHERE
@@ -53,16 +47,13 @@
         SELECT
             user.user_no,
             user.user_id,
-            user.user_pwd,
             user.user_name,
             user.platform,
             user.user_email,
-            user.create_date,
-            user.create_user,
-            user.update_user,
-            user.update_date,
-            user.del_yn,
-            user.user_uuid
+            user.user_uuid,
+            user.last_lgout,
+            user.last_lgin,
+            user.last_ticket_charge_time
         FROM
             tb_user_info user
         WHERE
@@ -193,12 +184,13 @@
             info.user_no = #{userNo}
     </update>
 
-    <update id="signOut" parameterType="Integer">
+    <update id="signOut" parameterType="com.teamalphano.zombieboom.dto.user.LogOutDto">
         UPDATE
             tb_user_info info
         SET
             info.update_date = now(),
-            info.last_lgout = now()
+            info.last_lgout = now(),
+            info.last_ticket_charge_time = #{lastTicketChargeTime}
         WHERE
             info.user_no = #{userNo}
     </update>

@@ -6,6 +6,7 @@ import com.teamalphano.zombieboom.dto.shop.admin.ProdCreateParamsDto;
 import com.teamalphano.zombieboom.dto.shop.admin.ProdListParamsDto;
 import com.teamalphano.zombieboom.dto.shop.admin.ProdUpdateDto;
 import com.teamalphano.zombieboom.model.shop.ProductAdmin;
+import com.teamalphano.zombieboom.model.shop.ProductItem;
 import com.teamalphano.zombieboom.model.shop.ProductLang;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,6 +22,8 @@ public interface ShopAdminMapper {
 
     //관리자 - 상품 언어 데이터 조회
     List<ProductLang> getProductLangs(Integer prodNo);
+
+    List<ProductItem> getProductItems(Integer prodNo);
 
     //상품 상세 등록
     int createProductAdmin(ProdCreateParamsDto prodCreateParamsDto);

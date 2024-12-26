@@ -145,7 +145,10 @@ public class UserInfoService {
     public String signOut(UserFullDataDto userFullDataDto){
         //데이터 업데이트
         userDataService.userDataUpdateByFullData(userFullDataDto);
-        int signOutBool = userInfoMapper.signOut(userFullDataDto.getUserInfo().getUserNo());
+        LogOutDto logOutDto = new LogOutDto();
+        logOutDto.setUserNo(userFullDataDto.getUserInfo().getUserNo());
+        logOutDto.setLastTicketChargeTime(userFullDataDto.getUserInfo().getLastTicketChargeTime());
+        int signOutBool = userInfoMapper.signOut(logOutDto);
         if(signOutBool > 0) {
             return "Success";
         }else{
