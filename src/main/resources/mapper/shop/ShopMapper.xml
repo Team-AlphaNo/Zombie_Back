@@ -20,6 +20,7 @@
             prod.prod_active,
             prod.unity_prod_type,
             prod.prod_img_key,
+            prod.is_unique,
             false AS isPurchased
         FROM
             tb_product prod

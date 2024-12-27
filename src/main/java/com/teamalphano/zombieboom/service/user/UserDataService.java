@@ -168,7 +168,7 @@ public class UserDataService {
         Integer userNo = userFullDataDto.getUserInfo().getUserNo();
         UpdateUserDataDto updateUserDataDto = new UpdateUserDataDto();
         BeanUtils.copyProperties(userFullDataDto.getUserData(), updateUserDataDto);
-        updateUserDataDto.setUserMoney(userNo);
+        updateUserDataDto.setUserNo(userNo);
         userDataMapper.updateUserData(updateUserDataDto);
     }
 

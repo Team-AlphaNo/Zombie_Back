@@ -25,7 +25,7 @@ public class RankController {
     ){
         try{
             List<RankDto> data= rankService.getWorldRankList(type);
-            return ResponseEntity.ok(new ApiResponse<>(200, "Success", data));
+            return ResponseEntity.ok(new ApiResponse<>(200, "AllRank", data));
         }catch (Exception e){
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }
@@ -38,7 +38,7 @@ public class RankController {
         try {
             System.out.println(rankInsertDto.toString());
             String insert = rankService.insertRank(rankInsertDto);
-            return ResponseEntity.ok(new ApiResponse<>(200, "Success", insert));
+            return ResponseEntity.ok(new ApiResponse<>(200, "MyRank", insert));
         }catch (Exception e){
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Internal server error", null));
         }
