@@ -6,10 +6,12 @@ import com.teamalphano.zombieboom.dto.logs.CreatePaymentLogDto;
 import com.teamalphano.zombieboom.dto.purchase.*;
 import com.teamalphano.zombieboom.dto.shop.ProductDto;
 import com.teamalphano.zombieboom.dto.user.UserDataDto;
+import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
 import com.teamalphano.zombieboom.service.logs.PaymentLogsService;
 import com.teamalphano.zombieboom.service.purchase.PurchaseService;
 import com.teamalphano.zombieboom.service.shop.ShopAdminService;
 import com.teamalphano.zombieboom.service.shop.ShopService;
+import com.teamalphano.zombieboom.service.user.UserCommonService;
 import com.teamalphano.zombieboom.service.user.UserDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,23 +30,27 @@ public class PurchaseController {
     private final UserDataService userDataService;
     private final ShopAdminService shopAdminService;
     private final PurchaseService purchaseService;
+    private final UserCommonService userCommonService;
 
     public PurchaseController(
             PaymentLogsService paymentLogsService,
             ShopService shopService,
             UserDataService userDataService,
             ShopAdminService shopAdminService,
-            PurchaseService purchaseService
+            PurchaseService purchaseService,
+            UserCommonService userCommonService
     ) {
         this.paymentLogsService = paymentLogsService;
         this.shopService = shopService;
         this.userDataService = userDataService;
         this.shopAdminService = shopAdminService;
         this.purchaseService = purchaseService;
+        this.userCommonService = userCommonService;
     }
 
     @PostMapping("/coin")
-    public ResponseEntity<ApiResponse<PurchaseResponseDto>> buyProductCoin(@RequestBody PurchaseReqCoinDto purchaseReqCoinDto) {
+    public ResponseEntity<ApiResponse<UserFullDataDto>> buyProductCoin(
+            @RequestBody PurchaseReqCoinDto purchaseReqCoinDto) {
         return handlePurchase(
                 purchaseReqCoinDto.getUserNo(),
                 purchaseReqCoinDto.getProdId(),
@@ -55,7 +61,8 @@ public class PurchaseController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity<ApiResponse<PurchaseResponseDto>> buyProductGoogle(@RequestBody PurchaseReqGoogleDto purchaseReqGoogleDto) {
+    public ResponseEntity<ApiResponse<UserFullDataDto>> buyProductGoogle(
+            @RequestBody PurchaseReqGoogleDto purchaseReqGoogleDto) {
         return handlePurchase(
                 purchaseReqGoogleDto.getUserNo(),
                 purchaseReqGoogleDto.getProdId(),
@@ -65,7 +72,7 @@ public class PurchaseController {
         );
     }
 
-    private ResponseEntity<ApiResponse<PurchaseResponseDto>> handlePurchase(
+    private ResponseEntity<ApiResponse<UserFullDataDto>> handlePurchase(
             Integer userNo,
             String prodId,
             String transactionId,
@@ -76,50 +83,66 @@ public class PurchaseController {
             return ResponseEntity.badRequest().body(new ApiResponse<>(400, "Bad Request", null));
         }
 
-        String message = "Processing";
-        PurchaseResponseDto responseData = new PurchaseResponseDto();
-        responseData.setUserDataDto(null);
+        UserFullDataDto responseData = new UserFullDataDto();
 
         try {
+            //상품 select
             ProductDto prod = shopService.getProductDetailById(prodId, "ko");
+            System.out.println("---------------------------");
+            System.out.println(prod.toString());
+            System.out.println("---------------------------");
             if (prod == null) {
-                message = "Product not found";
-                responseData.setPurchaseStatus(message);
-                return ResponseEntity.status(404).body(new ApiResponse<>(404, message, responseData));
+                return ResponseEntity.status(404).body(new ApiResponse<>(404, "error", responseData));
             }
 
+            //구입시도 log 저장
             CreatePaymentLogDto createPaymentLogDto = initializePaymentLog(userNo, prod, transactionId, paymentType);
-            if (!paymentLogsService.insertPaymentLog(createPaymentLogDto)) {
-                responseData.setPurchaseStatus("Purchase Logged Fail");
+            System.out.println("---------------------------");
+            System.out.println(createPaymentLogDto.toString());
+            System.out.println("---------------------------");
+            boolean insertLog = paymentLogsService.insertPaymentLog(createPaymentLogDto);
+
+            System.out.println("---------------------------");
+            if (!insertLog) {
                 return ResponseEntity.badRequest().body(new ApiResponse<>(500, "Logged Error", responseData));
             }
 
-            if ("google".equals(paymentType) && !validateGooglePurchase(prodId, purchaseToken, createPaymentLogDto)) {
-                responseData.setPurchaseStatus("Purchase Validation Fail");
-                return ResponseEntity.badRequest().body(new ApiResponse<>(500, "Validation Error", responseData));
+            if ("google".equals(paymentType) ) {
+                System.out.println("google check-------------------------");
+                boolean valid = validateGooglePurchase(prodId, purchaseToken, createPaymentLogDto);
+                if (!valid) {
+                    return ResponseEntity.badRequest().body(new ApiResponse<>(500, "Validation Error", responseData));
+                }
             }
 
             if (prod.isProdLimit()) {
+                System.out.println("limit update -------------------------");
                 updateProductPurchaseLimit(prod);
             }
 
-            DeductAmountDto deductAmountDto = new DeductAmountDto();
-            deductAmountDto.setUserNo(userNo);
-            deductAmountDto.setAmount(prod.getProdPrice());
-            boolean userDeducted = userDataService.deductAmount(deductAmountDto);
-            updatePaymentLog(createPaymentLogDto, userDeducted ? "PAID" : "PAID_FAIL");
+            if(prod.getProdPriceType()==2){
+                DeductAmountDto deductAmountDto = new DeductAmountDto();
+                deductAmountDto.setUserNo(userNo);
+                deductAmountDto.setAmount(prod.getProdPrice());
+                boolean userDeducted = userDataService.deductAmount(deductAmountDto);
+                updatePaymentLog(createPaymentLogDto, userDeducted ? "PAID" : "PAID_FAIL");
+            }else{
+                updatePaymentLog(createPaymentLogDto, "PAID" );
+            }
 
             PurchaseGrantDto purchaseGrantDto = new PurchaseGrantDto();
             purchaseGrantDto.setUserNo(userNo);
             purchaseGrantDto.setProdId(prodId);
-            UserDataDto userDataDto = userDataService.userGrantProduct(purchaseGrantDto);
-            updatePaymentLog(createPaymentLogDto, userDataDto !=null ? "GRANTED" : "GRANTED_FAIL");
+            boolean grant = userDataService.userGrantProduct(purchaseGrantDto);
+            updatePaymentLog(createPaymentLogDto, grant ? "GRANTED" : "GRANTED_FAIL");
 
-            responseData.setUserDataDto(userDataDto);
-            return ResponseEntity.ok(new ApiResponse<>(200, userDataDto !=null ? "GRANTED" : "GRANTED_FAIL", responseData));
+            responseData = userCommonService.getUserFullData(userNo);
+
+            System.out.println("---------------------------");
+            System.out.println(responseData.toString());
+
+            return ResponseEntity.ok(new ApiResponse<>(200, grant ? "GRANTED" : "GRANTED_FAIL", responseData));
         } catch (Exception e) {
-            message = "Exception occurred: " + e.getMessage();
-            responseData.setPurchaseStatus(message);
             return ResponseEntity.status(500).body(new ApiResponse<>(500, "Exception Error", responseData));
         }
     }
@@ -136,6 +159,7 @@ public class PurchaseController {
 
     private boolean validateGooglePurchase(String prodId, String purchaseToken, CreatePaymentLogDto createPaymentLogDto) throws GeneralSecurityException, IOException {
         ProductPurchase receipt = purchaseService.verifyReceiptForGoogleProduct(prodId, purchaseToken);
+        System.out.println(receipt.toString());
         boolean isValid = receipt.getPurchaseState() == 0;
         updatePaymentLog(createPaymentLogDto, isValid ? "VALID_SUCCESS" : "VALID_FAIL");
         return isValid;

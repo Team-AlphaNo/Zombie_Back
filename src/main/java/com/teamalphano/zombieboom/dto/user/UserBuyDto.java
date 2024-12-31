@@ -13,5 +13,5 @@ public class UserBuyDto {
     private Integer ticket;
     private String uniqProdList;
     private String timeTicketEndDate;
-    private String timeTicketRange;
+    private Integer timeTicketRange;
 }

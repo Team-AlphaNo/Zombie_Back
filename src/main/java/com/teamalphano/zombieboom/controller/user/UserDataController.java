@@ -4,6 +4,7 @@ import com.teamalphano.zombieboom.dto.common.ApiResponse;
 import com.teamalphano.zombieboom.dto.user.UpdateTicketDto;
 import com.teamalphano.zombieboom.dto.user.UserDataDto;
 import com.teamalphano.zombieboom.dto.user.UserFullDataDto;
+import com.teamalphano.zombieboom.service.user.UserCommonService;
 import com.teamalphano.zombieboom.service.user.UserDataService;
 import com.teamalphano.zombieboom.service.user.UserInfoService;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user/data")
 public class UserDataController {
     private final UserDataService userDataService;
-    private final UserInfoService userInfoService;
+    private final UserCommonService userCommonService;
 
     public UserDataController(
             UserDataService userDataService,
-            UserInfoService userInfoService) {
+            UserCommonService userCommonService) {
         this.userDataService = userDataService;
-        this.userInfoService = userInfoService;
+        this.userCommonService = userCommonService;
     }
 
     //유저 데이터 상세
@@ -44,12 +45,24 @@ public class UserDataController {
         try{
             int update = userDataService.updateUserTicket(updateTicketDto);
             if(update > 0){
-                UserFullDataDto fullData = userInfoService.getUserFullData(updateTicketDto.getUserNo());
+                UserFullDataDto fullData = userCommonService.getUserFullData(updateTicketDto.getUserNo());
                 return ResponseEntity.ok(new ApiResponse<>(200, "Success", fullData));
             }else{
                 return ResponseEntity.status(404).body(new ApiResponse<>(404, "Not Found", null));
             }
         }catch (Exception e){
+            return ResponseEntity.status(500).body(new ApiResponse<>(500 , "Internal server error", null));
+        }
+    }
+
+    @GetMapping("/useTicket")
+    public ResponseEntity<ApiResponse<UserFullDataDto>> useUserTicket(
+            @RequestParam (value = "userNo", required = true) Integer userNo
+    ){
+        try{
+            UserFullDataDto fullData = userDataService.useUserTicket(userNo);
+            return ResponseEntity.ok(new ApiResponse<>(200, "Success", fullData));
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(new ApiResponse<>(500 , "Internal server error", null));
         }
     }

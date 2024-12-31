@@ -50,4 +50,6 @@ public interface UserInfoMapper {
     int getLastInsertedUserNo();
 
     int signOut(LogOutDto logOutDto);
+
+    void updateChargeTimeNow(Integer userNo);
 }

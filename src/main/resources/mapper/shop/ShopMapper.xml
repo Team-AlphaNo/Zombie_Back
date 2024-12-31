@@ -39,7 +39,6 @@
             )
             AND prod.prod_active = true
             AND lang.lang_type = #{langType}
-
         ORDER BY
             CASE
                 WHEN prod.prod_limit = TRUE AND prod.prod_purchase_limit > 0 THEN 1
@@ -120,7 +119,14 @@
             )
             AND prod.prod_active = true
             AND prod.prod_id = #{prodId}
-            AND lang.lang_type = #{langType}
+        <choose>
+            <when test="langType != null and langType != ''">
+                AND lang.lang_type = #{langType}
+            </when>
+            <otherwise>
+                AND lang.lang_type = 'ko'
+            </otherwise>
+        </choose>
     </select>
 
     <select id="getProductDetailByNo" parameterType="com.teamalphano.zombieboom.dto.shop.ProductDto" resultType="com.teamalphano.zombieboom.dto.shop.ProductDto">

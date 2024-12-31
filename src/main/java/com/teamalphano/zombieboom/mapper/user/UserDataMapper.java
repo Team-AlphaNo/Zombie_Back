@@ -1,10 +1,7 @@
 package com.teamalphano.zombieboom.mapper.user;
 
 import com.teamalphano.zombieboom.dto.purchase.DeductAmountDto;
-import com.teamalphano.zombieboom.dto.user.UpdateTicketDto;
-import com.teamalphano.zombieboom.dto.user.UpdateUserDataDto;
-import com.teamalphano.zombieboom.dto.user.UserBuyDto;
-import com.teamalphano.zombieboom.dto.user.UserDataDto;
+import com.teamalphano.zombieboom.dto.user.*;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -20,4 +17,8 @@ public interface UserDataMapper {
     int updateUserData(UpdateUserDataDto updateUserDataDto);
 
     int updateUserTicket(UpdateTicketDto updateTicketDto);
+
+    int useUserTicket(Integer userNo);
+
+    int userUniqDataUpdate(UserBuyDto userBuyDto);
 }

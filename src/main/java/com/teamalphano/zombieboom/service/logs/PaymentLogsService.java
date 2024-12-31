@@ -24,11 +24,8 @@ public class PaymentLogsService {
     @Transactional
     public boolean insertPaymentLog(CreatePaymentLogDto createPaymentLogDto){
         int insert = paymentLogsMapper.insertPaymentLog(createPaymentLogDto);
-        if(insert > 0){
-            return true;
-        }else{
-            return false;
-        }
+        System.out.println("insert " + insert + " " + createPaymentLogDto);
+        return insert > 0;
     }
 
     @Transactional

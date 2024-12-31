@@ -91,9 +91,9 @@
 
     <insert id="insertDefaultUserData" parameterType="Int">
         INSERT INTO tb_user_data
-            (user_no, user_ticket)
+            (user_no, user_ticket, user_char_list)
         VALUES
-            (#{userNo}, 5)
+            (#{userNo}, 5, '[1]')
     </insert>
 
     <update id="updateGuestSignIn" parameterType="String">
@@ -191,6 +191,15 @@
             info.update_date = now(),
             info.last_lgout = now(),
             info.last_ticket_charge_time = #{lastTicketChargeTime}
+        WHERE
+            info.user_no = #{userNo}
+    </update>
+
+    <update id="updateChargeTimeNow" parameterType="int">
+        UPDATE
+            tb_user_info info
+        SET
+            info.last_ticket_charge_time = DATE_FORMAT(NOW(), '%d-%m-%y %H:%i:%s')
         WHERE
             info.user_no = #{userNo}
     </update>

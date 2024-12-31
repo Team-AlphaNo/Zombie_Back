@@ -22,10 +22,10 @@
             </if>
             <if test="timeTicketRange != null and timeTicketRange != ''">
                 data.time_ticket_end_date =
-                    CASE
-                        WHEN data.time_ticket_end_date IS NULL THEN now() + CAST(#{timeTicketRange} AS TIME)
-                        ELSE data.time_ticket_end_date + CAST(#{timeTicketRange} AS TIME)
-                    END
+                CASE
+                    WHEN data.time_ticket_end_date IS NULL THEN NOW() + INTERVAL #{timeTicketRange} SECOND
+                    ELSE data.time_ticket_end_date + INTERVAL #{timeTicketRange} SECOND
+                END
             </if>
         </set>
         WHERE
@@ -76,6 +76,24 @@
             tb_user_data data
         SET
             data.user_ticket = #{ticketCount}
+        WHERE
+            data.user_no = #{userNo}
+    </update>
+
+    <update id="useUserTicket" parameterType="Integer">
+        UPDATE
+            tb_user_data data
+        SET
+            data.user_ticket = data.user_ticket -1
+        WHERE
+            data.user_no = #{userNo}
+    </update>
+
+    <update id="userUniqDataUpdate" parameterType="com.teamalphano.zombieboom.dto.user.UserBuyDto">
+        UPDATE
+            tb_user_data data
+        SET
+            data.uniq_prod_list = #{uniqProdList}
         WHERE
             data.user_no = #{userNo}
     </update>

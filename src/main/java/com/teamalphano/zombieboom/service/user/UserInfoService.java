@@ -14,18 +14,19 @@ import java.util.List;
 @Service
 public class UserInfoService {
     private final UserInfoMapper userInfoMapper;
-    private final ItemMapper itemMapper;
     private final UserDataService userDataService;
+    private final UserCommonService userCommonService;
 
     public UserInfoService(UserInfoMapper userInfoMapper,
-                           ItemMapper itemMapper, UserDataService userDataService) {
+                           UserDataService userDataService,
+                           UserCommonService userCommonService
+    ) {
         this.userInfoMapper = userInfoMapper;
-        this.itemMapper = itemMapper;
         this.userDataService = userDataService;
+        this.userCommonService = userCommonService;
     }
 
-    //게스트 회원가입
-
+    //게스트 로그인
     @Transactional
     public UserFullDataDto GuestLogin(String uuid) {
         //uuid 있는지 체크
@@ -42,8 +43,7 @@ public class UserInfoService {
                 int userNo = newUserInfoDto.getUserNo();
                 int userData = userInfoMapper.insertDefaultUserData(userNo);
                 if(userData > 0) {
-                    UserFullDataDto fullData = getUserFullData(userNo);
-                    return fullData;
+                    return userCommonService.getUserFullData(userNo);
                 }
             }else {
                 return null;
@@ -53,18 +53,22 @@ public class UserInfoService {
             System.out.println("로그인처리");
             int updateLogin = userInfoMapper.updateGuestSignIn(uuid);
             if(updateLogin > 0) {
-                return getUserFullData(userInfoDto.getUserNo());
+                return userCommonService.getUserFullData(userInfoDto.getUserNo());
             }
         }
         return null;
     }
 
     //구글 로그인
-
     @Transactional
     public UserFullDataDto GoogleLogin(GoogleLoginDto googleLoginDto){
         UserInfoDto userInfoDto = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
+        System.out.println(userInfoDto.toString());
         if(userInfoDto.getUserUuid() == null) {
+            System.out.println("----------------------------------uuidEmpty");
+            //해당 기기로 등록된 데이터가 없음
+
+            System.out.println(googleLoginDto.toString());
             UserInfoDto _userInfoDto = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
             if(_userInfoDto != null) {
                 System.out.println("#########uuid는 없는데 해당 구글 아이디 있음");
@@ -73,7 +77,7 @@ public class UserInfoService {
                 //해당 구글아이디의 uuid를 업데이트
                 _userInfoDto.setUserUuid(googleLoginDto.getUserUuid());
                 userInfoMapper.updateUserInfoGoogleUUID(_userInfoDto);
-                return getUserFullData(_userInfoDto.getUserNo());
+                return userCommonService.getUserFullData(_userInfoDto.getUserNo());
             }else{
                 //회원가입
                 System.out.println("#########회원가입");
@@ -88,17 +92,22 @@ public class UserInfoService {
                     int insertData = userInfoMapper.insertDefaultUserData(newUserInfoDto.getUserNo());
                     if (insertData > 0) {
                         int userNo = newUserInfoDto.getUserNo();
-                        return getUserFullData(userNo);
+                        return userCommonService.getUserFullData(userNo);
+                    }else{
+                        throw new RuntimeException("Failed to insert Google SignUp data");
                     }
+                }else{
+                    throw new RuntimeException("Failed to insert Google SignUp data");
                 }
             }
         }else{
+            System.out.println("----------------------------------uuid OK");
             //게스트 id 있음
-            if(userInfoDto.getUserId() != null){
+            if(userInfoDto.getUserId() != null ){
                 //구글 로그인
                 System.out.println("#########게스트 아이디에 구글 로그인");
                 int updateLogin = userInfoMapper.updateGoogleSignIn(googleLoginDto.getUserId());
-                return getUserFullData(userInfoDto.getUserNo());
+                return userCommonService.getUserFullData(userInfoDto.getUserNo());
             }else{
                 //구글 아이디 찾기
                 UserInfoDto _userInfoDto = userInfoMapper.getUserInfoByUserId(googleLoginDto.getUserId());
@@ -110,7 +119,7 @@ public class UserInfoService {
                     userInfoMapper.inactiveUserInfoByUserNo(_userInfoDto.getUserNo());
                     _userInfoDto = userInfoMapper.getUserInfoByUUID(googleLoginDto.getUserUuid());
                     userInfoMapper.updateUuidForGuestToGoogle(_userInfoDto);
-                    return getUserFullData(_userInfoDto.getUserNo());
+                    return userCommonService.getUserFullData(_userInfoDto.getUserNo());
                 }else{
                     //게스트 아이디는 있으나 구글 아이디는 없음
                     //게스트 아이디에 구글아이디 업데이트
@@ -121,7 +130,7 @@ public class UserInfoService {
                     userInfoDto.setUserName(googleLoginDto.getUserName());
                     int update = userInfoMapper.updateGuestInfoToGPGS(userInfoDto);
                     if(update > 0) {
-                        return getUserFullData(userInfoDto.getUserNo());
+                        return userCommonService.getUserFullData(userInfoDto.getUserNo());
                     }else{
                         System.out.println("no update");
                     }
@@ -154,50 +163,5 @@ public class UserInfoService {
         }else{
             return "Fail";
         }
-    }
-
-    //전체 유저 데이터 조회
-    public UserFullDataDto getUserFullData(Integer userNo) {
-        // UserFullData 초기화
-        UserFullDataDto userFullDataDto = new UserFullDataDto();
-        UserInfoDto userInfoDto = userInfoMapper.getUserInfoByUserNo(userNo);
-        UserDataDto userDataDto = userInfoMapper.getUserDataByUserNo(userNo);
-
-        userFullDataDto.setUserInfo(userInfoDto);
-        userFullDataDto.setUserData(userDataDto);
-
-        // UserData에서 charList 가져오기
-        String charList = userDataDto.getUserCharList();
-        if (charList == null || charList.isEmpty()) {
-            return userFullDataDto;
-        }
-
-        try {
-            // 문자열에서 대괄호 제거 및 파싱
-            CharStringEdit charStringEdit = new CharStringEdit();
-            List<Integer> charNoList = charStringEdit.getIntList(charList);
-
-            // CharacterData 리스트 생성
-            List<ItemData> charDataList = new ArrayList<>();
-            for (int charId : charNoList) {
-                System.out.println("Processing charId: " + charId);
-                ItemData charData = itemMapper.getCharData(charId);
-                if (charData != null) {
-                    charDataList.add(charData);
-                } else {
-                    System.err.println("No CharacterData found for charId: " + charId);
-                }
-            }
-
-            userDataDto.setUserCharDataList(charDataList);
-
-        } catch (NumberFormatException e) {
-            System.err.println("Failed to parse UserCharList: " + charList);
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Unexpected error occurred while processing UserCharList for userNo: " + userNo);
-            e.printStackTrace();
-        }
-        return userFullDataDto;
     }
 }
