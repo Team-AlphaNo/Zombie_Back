@@ -7,14 +7,14 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserDataMapper {
 
-    int updateUserDataAfterPurchase(UserBuyDto userBuyDto);
+    int updateAfterPurchase(UserBuyDto userBuyDto);
 
     //유저 데이터 조회
     UserDataDto getUserData(Integer userNo);
 
     int deductUserCoin(DeductAmountDto deductAmountDto);
 
-    int updateUserData(UpdateUserDataDto updateUserDataDto);
+    void updateUserData(UpdateUserDataDto updateUserDataDto);
 
     int updateUserTicket(UpdateTicketDto updateTicketDto);
 

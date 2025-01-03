@@ -93,7 +93,7 @@
         INSERT INTO tb_user_data
             (user_no, user_ticket, user_char_list)
         VALUES
-            (#{userNo}, 5, '[1]')
+            (#{userNo}, 4, '[1]')
     </insert>
 
     <update id="updateGuestSignIn" parameterType="String">

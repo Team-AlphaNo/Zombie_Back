@@ -5,14 +5,14 @@
 
 <mapper namespace="com.teamalphano.zombieboom.mapper.user.UserDataMapper">
 
-    <update id="updateUserDataAfterPurchase" parameterType="com.teamalphano.zombieboom.dto.user.UserBuyDto">
+    <update id="updateAfterPurchase" parameterType="com.teamalphano.zombieboom.dto.user.UserBuyDto">
         UPDATE  tb_user_data data
         <set>
             <if test="ticket != null and ticket !=0">
-                data.user_ticket = #{ticket},
+                data.user_ticket = data.user_ticket + #{ticket},
             </if>
             <if test="coin != null and coin !=0 ">
-                data.user_money = #{coin},
+                data.user_money = data.user_money + #{coin},
             </if>
             <if test="charList != null and charList != ''">
                 data.user_char_list = #{charList},
@@ -50,7 +50,7 @@
         UPDATE
             tb_user_data data
         SET
-            data.user_money = #{amount}
+            data.user_money = data.user_money - #{amount}
         WHERE
             data.user_no = #{userNo}
     </update>

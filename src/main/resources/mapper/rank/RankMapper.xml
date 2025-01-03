@@ -175,10 +175,7 @@
         VALUES (
             #{userNo},
             #{rankValue},
-            CASE
-                WHEN HOUR(NOW()) >= 5 THEN DATE(NOW())
-                ELSE DATE(DATE_SUB(NOW(), INTERVAL 1 DAY))
-            END
+           now()
         )
         ON DUPLICATE KEY UPDATE
             rank_value =
@@ -200,7 +197,7 @@
                 ROW_NUMBER() OVER (
                     PARTITION BY ran.user_no
                     ORDER BY ran.rank_value DESC
-                ) AS row_num
+                ) AS ranking
             FROM
                 tb_rank AS ran
             INNER JOIN
@@ -209,54 +206,34 @@
                 AND user.del_yn = false
         ),
         TopRanks AS (
-            SELECT
-                ROW_NUMBER() OVER (
-                    ORDER BY rank_value DESC
-                ) AS ranking,
-                rank_no,
-                user_no,
-                rank_value,
-                create_date,
-                user_id,
-                user_name
-            FROM
-                RankedRanks
-            WHERE
-                row_num = 1
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       ORDER BY rank_value DESC
+                   ) AS overall_ranking
+            FROM RankedRanks
+            WHERE ranking = 1
             LIMIT 50
         ),
         UserSpecificRank AS (
-            SELECT
-                rank_no,
-                user_no,
-                rank_value,
-                create_date,
-                user_id,
-                user_name,
-                ROW_NUMBER() OVER (
-                    ORDER BY rank_value DESC
-                ) AS ranking
-            FROM
-                RankedRanks
-            WHERE
-                user_no = #{userNo}
+            SELECT *
+            FROM RankedRanks
+            WHERE user_no = #{userNo}
+            AND ranking = 1
         )
         SELECT
-            rank_no,
-            user_no,
-            rank_value,
-            create_date,
-            user_id,
-            user_name,
+            usr.rank_no,
+            usr.user_no,
+            usr.rank_value,
+            usr.create_date,
+            usr.user_id,
+            usr.user_name,
             CASE
-                WHEN user_no IN (SELECT user_no FROM TopRanks) THEN (SELECT ranking FROM TopRanks WHERE user_no = #{userNo})
+                WHEN usr.user_no IN (SELECT user_no FROM TopRanks)
+                THEN (SELECT t.overall_ranking FROM TopRanks t WHERE t.user_no = usr.user_no)
                 ELSE '-'
             END AS ranking
         FROM
-            UserSpecificRank
-        WHERE
-            rank_value = (SELECT MAX(rank_value) FROM UserSpecificRank)
-        LIMIT 1;
+            UserSpecificRank usr;
     </select>
 
     <select id="getMyRankMonth" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
@@ -271,14 +248,14 @@
                 ROW_NUMBER() OVER (
                     PARTITION BY ran.user_no
                     ORDER BY ran.rank_value DESC
-                ) AS row_num
+                ) AS ranking
             FROM
                 tb_rank AS ran
             INNER JOIN
                 tb_user_info AS user
                 ON user.user_no = ran.user_no
+                AND user.del_yn = false
             WHERE
-                (
                     CASE
                         WHEN DAY(CURDATE()) = 1 THEN
                             ran.create_date BETWEEN
@@ -289,74 +266,36 @@
                                 CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-01'), ' 05:00:00') AND
                                 DATE_FORMAT(DATE_ADD(LAST_DAY(CURDATE()), INTERVAL 1 DAY), '%Y-%m-%d 04:59:59')
                     END
-                )
-                AND user.del_yn = false
         ),
         TopRanks AS (
-            SELECT
-                ROW_NUMBER() OVER (
-                    ORDER BY rank_value DESC
-                ) AS ranking,
-                rank_no,
-                user_no,
-                rank_value,
-                create_date,
-                user_id,
-                user_name
-            FROM
-                RankedRanks
-            WHERE
-                row_num = 1
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       ORDER BY rank_value DESC
+                   ) AS overall_ranking
+            FROM RankedRanks
+            WHERE ranking = 1
             LIMIT 50
         ),
         UserSpecificRank AS (
-            SELECT
-                rank_no,
-                user_no,
-                rank_value,
-                create_date,
-                user_id,
-                user_name,
-                ROW_NUMBER() OVER (
-                    ORDER BY rank_value DESC
-                ) AS ranking
-            FROM
-                RankedRanks
-            WHERE
-                user_no = #{userNo}
+            SELECT *
+            FROM RankedRanks
+            WHERE user_no = #{userNo}
+            AND ranking = 1
         )
         SELECT
-            COALESCE(t.rank_no, u.rank_no) AS rank_no,
-            COALESCE(t.user_no, u.user_no) AS user_no,
-            COALESCE(t.rank_value, u.rank_value) AS rank_value,
-            COALESCE(t.create_date, u.create_date) AS create_date,
-            COALESCE(t.user_id, u.user_id) AS user_id,
-            COALESCE(t.user_name, u.user_name) AS user_name,
+            usr.rank_no,
+            usr.user_no,
+            usr.rank_value,
+            usr.create_date,
+            usr.user_id,
+            usr.user_name,
             CASE
-                WHEN t.user_no IS NOT NULL THEN t.ranking
+                WHEN usr.user_no IN (SELECT user_no FROM TopRanks)
+                THEN (SELECT t.overall_ranking FROM TopRanks t WHERE t.user_no = usr.user_no)
                 ELSE '-'
             END AS ranking
         FROM
-            TopRanks t
-        LEFT JOIN
-            UserSpecificRank u
-            ON t.user_no = u.user_no
-        UNION ALL
-        SELECT
-            u.rank_no,
-            u.user_no,
-            u.rank_value,
-            u.create_date,
-            u.user_id,
-            u.user_name,
-            '-'
-        FROM
-            UserSpecificRank u
-        WHERE
-            u.user_no NOT IN (SELECT user_no FROM TopRanks)
-        ORDER BY
-            rank_value DESC
-        LIMIT 1;
+            UserSpecificRank usr;
     </select>
 
     <select id="getMyRankDay" parameterType="Integer" resultType="com.teamalphano.zombieboom.dto.rank.RankDto">
@@ -371,96 +310,55 @@
                 ROW_NUMBER() OVER (
                     PARTITION BY ran.user_no
                     ORDER BY ran.rank_value DESC
-                ) AS row_num
+                ) AS ranking
             FROM
                 tb_rank AS ran
             INNER JOIN
                 tb_user_info AS user
                 ON user.user_no = ran.user_no
-            WHERE
-                (
-                    CASE
-                        WHEN HOUR(NOW()) &lt; 5 THEN
-                        ran.create_date BETWEEN
-                        CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 05:00:00') AND
-                        CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 04:59:59')
-                    ELSE
-                        ran.create_date BETWEEN
-                        CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 05:00:00') AND
-                        CONCAT(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 04:59:59')
-                    END
-                )
                 AND user.del_yn = false
-            ),
-            TopRanks AS (
-                SELECT
-                    ROW_NUMBER() OVER (
-                    ORDER BY rank_value DESC
-                    ) AS ranking,
-                    rank_no,
-                    user_no,
-                    rank_value,
-                    create_date,
-                    user_id,
-                    user_name
-                FROM
-                    RankedRanks
-                LIMIT 50
-                ),
-            UserSpecificRank AS (
-                SELECT
-                    rank_no,
-                    user_no,
-                    rank_value,
-                    create_date,
-                    user_id,
-                    user_name,
-                    ROW_NUMBER() OVER (
-                        ORDER BY rank_value DESC
-                    ) AS ranking
-                FROM
-                    RankedRanks
                 WHERE
-                    user_no = #{userNo}
-            )
-                SELECT
-                    rank_no,
-                    user_no,
-                    rank_value,
-                    create_date,
-                    user_id,
-                    user_name,
-                    ranking
-                FROM (
-                    SELECT
-                        TopRanks.rank_no,
-                        TopRanks.user_no,
-                        TopRanks.rank_value,
-                        TopRanks.create_date,
-                        TopRanks.user_id,
-                        TopRanks.user_name,
-                        TopRanks.ranking
-                    FROM
-                        TopRanks
-                    UNION ALL
-                    SELECT
-                        UserSpecificRank.rank_no,
-                        UserSpecificRank.user_no,
-                        UserSpecificRank.rank_value,
-                        UserSpecificRank.create_date,
-                        UserSpecificRank.user_id,
-                        UserSpecificRank.user_name,
-                    CASE
-                        WHEN UserSpecificRank.ranking &lt;= 50 THEN UserSpecificRank.ranking
-                    ELSE '-'
-                        END AS ranking
-                    FROM
-                        UserSpecificRank
-                    WHERE
-                        UserSpecificRank.ranking > 50
-                    ) AS CombinedRanks
-                ORDER BY
-                ranking ASC
-            LIMIT 1;
+                   (
+                        CASE
+                        WHEN HOUR(NOW()) &lt; 5 THEN
+                            ran.create_date BETWEEN
+                            CONCAT(DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 05:00:00') AND
+                            CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 04:59:59')
+                        ELSE
+                            ran.create_date BETWEEN
+                            CONCAT(DATE_FORMAT(CURDATE(), '%Y-%m-%d'), ' 05:00:00') AND
+                            CONCAT(DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d'), ' 04:59:59')
+                        END
+                    )
+        ),
+        TopRanks AS (
+            SELECT *,
+                   ROW_NUMBER() OVER (
+                       ORDER BY rank_value DESC
+                   ) AS overall_ranking
+            FROM RankedRanks
+            WHERE ranking = 1
+            LIMIT 50
+        ),
+        UserSpecificRank AS (
+            SELECT *
+            FROM RankedRanks
+            WHERE user_no = #{userNo}
+            AND ranking = 1
+        )
+        SELECT
+            usr.rank_no,
+            usr.user_no,
+            usr.rank_value,
+            usr.create_date,
+            usr.user_id,
+            usr.user_name,
+            CASE
+                WHEN usr.user_no IN (SELECT user_no FROM TopRanks)
+                THEN (SELECT t.overall_ranking FROM TopRanks t WHERE t.user_no = usr.user_no)
+                ELSE '-'
+            END AS ranking
+        FROM
+            UserSpecificRank usr;
     </select>
 </mapper>

@@ -88,9 +88,6 @@ public class PurchaseController {
         try {
             //상품 select
             ProductDto prod = shopService.getProductDetailById(prodId, "ko");
-            System.out.println("---------------------------");
-            System.out.println(prod.toString());
-            System.out.println("---------------------------");
             if (prod == null) {
                 return ResponseEntity.status(404).body(new ApiResponse<>(404, "error", responseData));
             }
@@ -120,7 +117,7 @@ public class PurchaseController {
                 updateProductPurchaseLimit(prod);
             }
 
-            if(prod.getProdPriceType()==2){
+            if(prod.getProdPriceType()==1){
                 DeductAmountDto deductAmountDto = new DeductAmountDto();
                 deductAmountDto.setUserNo(userNo);
                 deductAmountDto.setAmount(prod.getProdPrice());

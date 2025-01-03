@@ -101,7 +101,8 @@
             prod.prod_ordr,
             prod.prod_active,
             prod.unity_prod_type,
-            prod.prod_img_key
+            prod.prod_img_key,
+            prod.is_unique
         FROM
             tb_product prod
         INNER JOIN

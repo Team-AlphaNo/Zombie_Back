@@ -63,17 +63,25 @@ public class UserDataService {
 
             UserDataDto _userDataDto = userDataMapper.getUserData(userBuyDto.getUserNo());
 
+            System.out.println("update---------"+userBuyDto.toString());
+
             if(product.isUnique()){
+                System.out.println("unique");
                 if(_userDataDto.getUniqProdList() !=null) {
                     String uniqList = _userDataDto.getUniqProdList();
 
                     List<Integer> _uniqProdList = charStringEdit.getIntList(uniqList);
                     _uniqProdList.add(product.getProdNo());
                     userBuyDto.setUniqProdList(charStringEdit.getListToString(_uniqProdList));
+                }else{
+                    List<Integer> _uniqProdList = new ArrayList<>();
+                    _uniqProdList.add(product.getProdNo());
+                    userBuyDto.setUniqProdList(charStringEdit.getListToString(_uniqProdList));
                 }
             }
 
-            if(userBuyDto.getCharList() !=null){
+            if(userBuyDto.getCharList() !=null && !userBuyDto.getCharList().isEmpty()){
+                System.out.println("charList");
                 String charList = _userDataDto.getUserCharList();
 
                 List<Integer> _charList = charStringEdit.getIntList(charList);
@@ -83,7 +91,7 @@ public class UserDataService {
             }
 
             //유저 데이터 갱신
-            int updateUserData = userDataMapper.updateUserDataAfterPurchase(userBuyDto);
+            int updateUserData = userDataMapper.updateAfterPurchase(userBuyDto);
             if(updateUserData > 0) {
                 if(userBuyDto.getTimeTicketRange() != null && userBuyDto.getTimeTicketRange()!=0) {
                     userInfoMapper.updateChargeTimeNow(purchaseGrantDto.getUserNo());
@@ -153,13 +161,14 @@ public class UserDataService {
                     coin += items.getItemCount();
                 } else if (items.getItemType() == 3) {
                     // 열쇠
-                    System.out.println(items.getItemTime());
+                    System.out.println("key time : "+items.getItemTime());
                     String itemTime = items.getItemTime();
                     if (itemTime != null && !itemTime.isEmpty()) {
                         totalSeconds += parseTimeToSeconds(itemTime);
                         System.out.println("totalSeconds ========" + totalSeconds);
                     } else {
                         ticket += items.getItemCount();
+                        System.out.println("total ticket ========" + ticket);
                     }
                 }
             }
